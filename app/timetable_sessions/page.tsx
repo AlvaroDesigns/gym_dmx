@@ -1,0 +1,103 @@
+'use client';
+
+import EditSheetForm from '@/components/form/EditSheetForm';
+import GymCalendar from '@/components/gym-calendar';
+import { ProductLayout } from '@/components/layout/product';
+import { LITERALS } from '@/data/literals';
+import { getFieldsModalCalendar } from '@/data/modals';
+import { useGetEvents } from '@/hooks/events/use-get-events';
+import { usePostEvents } from '@/hooks/events/use-post-events';
+import { useGetMaestres } from '@/hooks/use-get-maesters';
+import dayjs from 'dayjs';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+
+type ClassFormValues = {
+  className: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  room: string;
+  maxCapacity: number;
+  monitor: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  date: string;
+};
+
+export default function Page() {
+  const [openCalendarForm, setOpenCalendarForm] = useState(false);
+
+  const { data } = useGetMaestres();
+
+  const createCalendarMutation = usePostEvents();
+  const fields = getFieldsModalCalendar(data);
+
+  const { startDate, endDate } = useMemo(() => {
+    const start = dayjs().startOf('week');
+    const end = start.add(6, 'day');
+    return {
+      startDate: start.format('YYYY-MM-DD'),
+      endDate: end.format('YYYY-MM-DD'),
+    };
+  }, []);
+
+  const { data: events, isLoading, error } = useGetEvents({ startDate, endDate });
+
+  const formClass = useForm<ClassFormValues>({
+    defaultValues: {
+      className: 'Cycling',
+      description: '',
+      startTime: '09:00',
+      endTime: '10:00',
+      room: 'Estudio 1',
+      maxCapacity: 20,
+      monitor: '',
+      difficulty: 'MEDIUM',
+      date: '2025-08-19',
+    },
+  });
+
+  const handleCreateClass = (data: ClassFormValues) => {
+    createCalendarMutation.mutate(
+      { ...data },
+      {
+        onSuccess: () => {
+          toast.success(`${LITERALS.CLASS} ${LITERALS.MESSAGES.CREATE}`);
+        },
+        onError: () => {
+          toast.error(LITERALS.MESSAGES.ERROR);
+        },
+      },
+    );
+  };
+
+  const onSubmitClass = (data: ClassFormValues) => {
+    handleCreateClass(data);
+    setOpenCalendarForm(false);
+    formClass.reset();
+  };
+
+  return (
+    <ProductLayout
+      buttonProps={{ text: 'Añadir actividades', routingUri: 'custom', type: 'class' }}
+      isView={false}
+      isLoading={isLoading}
+      customButton={
+        <EditSheetForm
+          open={openCalendarForm}
+          setOpen={setOpenCalendarForm}
+          form={formClass}
+          onSubmit={onSubmitClass}
+          sizeButton="sm"
+          triggerText="Añadir actividades"
+          title="Crear nueva actividad"
+          description="Añade una nueva actividad. Completa los campos y guarda los cambios."
+          fields={fields}
+        />
+      }
+    >
+      <GymCalendar data={events ?? []} />
+    </ProductLayout>
+  );
+}

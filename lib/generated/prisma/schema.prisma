@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  EMPLOYEE
+}
+
+enum Gender {
+  M
+  F
+}
+
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model User {
+  id            String      @id @default(uuid())
+  firstName     String
+  lastName1     String
+  lastName2     String?
+  birthDate     DateTime
+  gender        Gender
+  dni           String      @unique
+  phone         String
+  postalCode    String
+  address       String
+  city          String
+  province      String
+  email         String      @unique
+  createdAt     DateTime    @default(now())
+  lastOrderDate DateTime?
+  roles         Role[]
+  classes       UserClass[]
+}
+
+model Class {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  dayOfWeek   Weekday // Lunes, Martes, etc.
+  startTime   DateTime
+  maxCapacity Int
+  userClasses UserClass[]
+}
+
+model UserClass {
+  id       String   @id @default(uuid())
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String
+  class    Class    @relation(fields: [classId], references: [id])
+  classId  String
+  date     DateTime // Día específico en que el usuario se apuntó
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, classId, date]) // Evita duplicaciones en el mismo día
+}
