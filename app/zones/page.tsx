@@ -49,6 +49,7 @@ export default function Page() {
 
   return (
     <ProductLayout
+      isView
       buttonProps={{ text: 'Añadir zonas', routingUri: 'custom', type: 'zone' }}
       isLoading={isLoading}
       customButton={

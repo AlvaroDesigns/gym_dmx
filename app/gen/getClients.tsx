@@ -1,11 +1,11 @@
+import { RolesType } from '@/types';
 import { UserData } from '@/types/user';
 import axios, { AxiosRequestConfig } from 'axios';
-
-type RolesType = 'ADMIN' | 'USER' | 'EMPLOYEE';
 
 interface GetUsersParams {
   roles?: RolesType;
   dni?: UserData['dni'];
+  email?: UserData['email'];
 }
 
 function getUsersUrl(params: GetUsersParams = {}): string {
@@ -18,6 +18,10 @@ function getUsersUrl(params: GetUsersParams = {}): string {
 
   if (params?.dni) {
     url.searchParams.set('dni', params?.dni);
+  }
+
+  if (params?.email) {
+    url.searchParams.set('email', params?.email);
   }
 
   return url.pathname + url.search;

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useViewToggle } from '@/hooks/use-view-toggle';
 import { useGetUsers } from '@/hooks/users/use-get-users';
+import { ROLES_EMPLOYEE } from '@/types';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -21,7 +22,7 @@ export default function Page() {
     ['default', 'compiled'],
   );
 
-  const { data, isLoading } = useGetUsers({ roles: ['EMPLOYEE'] });
+  const { data, isLoading } = useGetUsers({ roles: ROLES_EMPLOYEE });
 
   const filteredStaff = data?.filter((staff) => {
     const fullName = `${staff.name} ${staff.surname}`.toLowerCase();
@@ -48,10 +49,11 @@ export default function Page() {
 
   return (
     <ProductLayout
+      isView
       onChangeView={handleProductLayoutViewChange}
       view={currentView}
       buttonProps={{
-        text: 'Añadir Empleado',
+        text: 'Añadir personal',
         routingUri: 'internal',
         url: '/staff/create_staff',
       }}

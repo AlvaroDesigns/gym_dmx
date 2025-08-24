@@ -131,6 +131,10 @@
   border-color: #e5e7eb; /* gray-200 */
 }
 
+.rbc-day-slot .rbc-events-container {
+  margin-right: initial !important;
+}
+
 .rbc-time-content {
   border-left: 1px solid #e5e7eb;
 }
@@ -140,6 +144,15 @@
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 500;
+}
+
+/* Altura de cada grupo de timeslots */
+.rbc-timeslot-group {
+  min-height: 70px !important;
+}
+
+.rbc-day-slot .rbc-event {
+  min-height: 70px !important;
 }
 
 /* Ejemplo: cambiar fondo a un gris suave */

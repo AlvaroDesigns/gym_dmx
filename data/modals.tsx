@@ -1,7 +1,9 @@
-type ClassType = 'classes' | 'zones' | undefined;
+import { MAX_DAY_FOR_CALENDAR } from '@/config/configuration';
+import { ClassTypes } from '@/types';
+import dayjs from 'dayjs';
 
 export const getEditFieldsModalZones = (
-  type: ClassType,
+  type: ClassTypes,
   name: string,
   description: string,
   room: string,
@@ -46,6 +48,7 @@ export const getEditFieldsModalZones = (
       name: 'room',
       label: 'Sala',
       placeholder: 'Selecciona la sala',
+      searchable: false,
       options: [
         { label: `Sala ${room}`, value: room },
         { label: 'Sala 1', value: 'sala1' },
@@ -65,7 +68,7 @@ export const getEditFieldsModalZones = (
   ];
 };
 
-export const getFieldsModalZones = (type: ClassType): any[] => {
+export const getFieldsModalZones = (type: ClassTypes): any[] => {
   if (type === 'zones') {
     return [
       {
@@ -107,6 +110,7 @@ export const getFieldsModalZones = (type: ClassType): any[] => {
       name: 'room',
       label: 'Sala',
       placeholder: 'Selecciona la sala',
+      searchable: true,
       options: [
         { label: `Sala ${1}`, value: 1 },
         { label: 'Sala 1', value: 'sala1' },
@@ -135,7 +139,15 @@ export const getFieldsModalCalendar = (data?: any): any[] => {
       name: 'className',
       label: 'Nombre de la clase *',
       placeholder: 'Ej: Yoga, Spinning, Pilates',
+      searchable: true,
       options: classes,
+    },
+    {
+      type: 'date',
+      name: 'date',
+      label: 'Fecha *',
+      placeholder: 'Elige tu fecha de tu actividad',
+      maxDate: dayjs().add(MAX_DAY_FOR_CALENDAR, 'day').toDate(),
     },
     {
       type: 'time',
@@ -152,6 +164,7 @@ export const getFieldsModalCalendar = (data?: any): any[] => {
       name: 'room',
       label: 'Sala *',
       placeholder: 'Ej: Sala 1, Studio A',
+      searchable: true,
       options: zones,
     },
     {
@@ -164,6 +177,7 @@ export const getFieldsModalCalendar = (data?: any): any[] => {
       name: 'monitor',
       label: 'Nombre del monitor',
       placeholder: 'Ej: Juan Perez',
+      searchable: true,
       options: employees,
     },
     {
@@ -171,6 +185,7 @@ export const getFieldsModalCalendar = (data?: any): any[] => {
       name: 'difficulty',
       label: 'Dificultad',
       placeholder: 'Ej: Sala 1, Studio A',
+      searchable: true,
       options: [
         { label: 'Fácil', value: 'EASY' },
         { label: 'Media', value: 'MEDIUM' },

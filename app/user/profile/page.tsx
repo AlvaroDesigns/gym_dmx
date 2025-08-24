@@ -6,6 +6,7 @@ import { BottomTabs } from '@/components/bottom-tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { FormItem } from '@/components/ui/form';
+import { useGetUsers } from '@/hooks/users/use-get-users';
 
 const USER = {
   name: 'Álvaro Saiz Bonilla',
@@ -16,6 +17,12 @@ const USER = {
 };
 
 export default function Page() {
+  const { data } = useGetUsers({
+    email: 'hello@alvarodesigns.com',
+  });
+
+  const user = data?.[0];
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
@@ -24,7 +31,7 @@ export default function Page() {
           <div className="flex justify-center gap-4 items-center">
             <Avatar className="h-30 w-30">
               <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>{USER.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
             </Avatar>
           </div>
         </div>
@@ -37,7 +44,8 @@ export default function Page() {
                 className="h-12"
                 type="text"
                 id="name"
-                defaultValue=""
+                readOnly
+                defaultValue={user?.name}
                 placeholder="Nombre de usuario"
               />
             </FormItem>
@@ -47,7 +55,7 @@ export default function Page() {
                 className="h-12"
                 type="text"
                 id="name"
-                defaultValue=""
+                defaultValue={user?.instagram ?? ''}
                 placeholder="www.instagram.com/tu_usuario"
               />
             </FormItem>
@@ -57,7 +65,7 @@ export default function Page() {
                 className="h-12"
                 type="text"
                 id="name"
-                defaultValue=""
+                defaultValue={user?.tiktok ?? ''}
                 placeholder="www.tiktok.com/@tu_usuario"
               />
             </FormItem>

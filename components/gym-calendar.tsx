@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import type { CalendarEventDto } from '@/app/gen/calendar/calendarService';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { TAILWIND_HEX_COLORS } from '@/config/colors';
 import { useClasses } from '@/hooks/useClasses';
 import { Card } from './ui/card';
 
@@ -105,8 +106,7 @@ export default function GymCalendar({ data }: GymCalendarProps) {
       return `${startStr} al ${endStr}`;
     },
     timeGutterFormat: (date: Date) => format(date, 'HH:mm', { locale: es }), // horas del lateral
-    eventTimeRangeFormat: ({ start, end }: Event) =>
-      `${format(start, 'HH:mm')} – ${format(end, 'HH:mm')}`,
+    eventTimeRangeFormat: () => '',
   };
 
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
@@ -205,10 +205,11 @@ export default function GymCalendar({ data }: GymCalendarProps) {
         participants: e.participants,
         maxCapacity: e.maxCapacity,
       },
+      monitor: e.monitor,
       allDay: false,
     }));
   }, [data]);
-
+  console.log('propEvents', propEvents);
   // Cargar eventos automáticamente solo si no se proporcionan por props
   useEffect(() => {
     if (propEvents) return;
@@ -261,17 +262,41 @@ export default function GymCalendar({ data }: GymCalendarProps) {
             day: 'Día',
             agenda: 'Agenda',
           }}
-          eventPropGetter={(event: Event) => ({
-            style: {
-              backgroundColor: event.color || '#3b82f6',
-              borderRadius: '6px',
-              color: 'white',
-              border: 'none',
-              padding: '4px 8px',
-              fontWeight: '500',
-              fontSize: '0.875rem',
+          components={{
+            event: ({ event }: { event: any }) => {
+              const monitor = event?.monitor ?? '';
+              const time = `${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`;
+              console.log('events', event);
+              return (
+                <div className="flex flex-col items-left justify-center mt-1">
+                  <span className="text-[13px] font-normal opacity-80">{time}</span>
+                  <span className=" text-[15px] font-semibold leading-tight">
+                    {event.title}
+                  </span>
+                  {monitor && (
+                    <span className="text-[14px] opacity-80 mt-2">{monitor}</span>
+                  )}
+                </div>
+              );
             },
-          })}
+          }}
+          eventPropGetter={(event: Event) => {
+            const backgroundColor =
+              TAILWIND_HEX_COLORS[event.color as keyof typeof TAILWIND_HEX_COLORS] ??
+              event.color ??
+              '#3b82f6';
+            return {
+              style: {
+                backgroundColor,
+                borderRadius: '0',
+                color: '#0b1220',
+                border: 'none',
+                padding: '4px 8px',
+                fontWeight: '500',
+                fontSize: '0.875rem',
+              },
+            };
+          }}
         />
       </Card>
 

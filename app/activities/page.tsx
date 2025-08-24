@@ -36,7 +36,9 @@ export default function Page() {
 
   const handleCreateClass = (data: ClassData) => {
     createClassMutation.mutate(
-      { ...data },
+      {
+        ...data,
+      },
       {
         onSuccess: () => {
           toast.success(`${LITERALS.CLASS} ${LITERALS.MESSAGES.CREATE}`);
@@ -65,6 +67,7 @@ export default function Page() {
 
   return (
     <ProductLayout
+      isView
       buttonProps={{ text: 'Añadir actividad', routingUri: 'custom', type: 'class' }}
       isLoading={isLoading}
       onChangeView={handleProductLayoutViewChange}

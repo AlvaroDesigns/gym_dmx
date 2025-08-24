@@ -24,10 +24,13 @@ import {
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import dayjs from 'dayjs';
 
 import { FieldValues, Path } from 'react-hook-form';
 
+import * as React from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { DatePicker } from '../datePicker';
 
 type FieldOption = {
   value: string;
@@ -44,11 +47,19 @@ type FieldConfig<T extends FieldValues> =
       defaultValue?: string;
     }
   | {
+      type: 'date';
+      name: Path<T>;
+      label: string;
+      placeholder?: string;
+      maxDate?: Date;
+    }
+  | {
       type: 'select';
       name: Path<T>;
       label: string;
       placeholder?: string;
       options: FieldOption[];
+      searchable?: boolean;
     }
   | {
       type: 'slider';
@@ -75,6 +86,98 @@ export interface EditSheetFormProps<T extends FieldValues = FieldValues> {
   fields: FieldConfig<T>[];
 }
 
+function SearchableTimeSelect({
+  value,
+  onValueChange,
+  placeholder,
+  options,
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+  placeholder?: string;
+  options: string[];
+}) {
+  const [query, setQuery] = React.useState('');
+  const filtered = React.useMemo(() => {
+    const q = query.trim();
+    if (!q) return options;
+    return options.filter((opt) => opt.toLowerCase().includes(q.toLowerCase()));
+  }, [options, query]);
+
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className="w-full min-h-12">
+        <SelectValue placeholder={placeholder || 'Selecciona hora'} />
+      </SelectTrigger>
+      <SelectContent>
+        <div className="p-2 sticky top-0 bg-background">
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar..."
+            className="h-9"
+            onKeyDown={(e) => e.stopPropagation()}
+          />
+        </div>
+        <SelectGroup>
+          {filtered.map((t) => (
+            <SelectItem key={t} value={t}>
+              {t}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
+function SearchableSelect({
+  value,
+  onValueChange,
+  placeholder,
+  options,
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+  placeholder?: string;
+  options: FieldOption[];
+}) {
+  const [query, setQuery] = React.useState('');
+  const filtered = React.useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter(
+      (opt) => opt.label.toLowerCase().includes(q) || opt.value.toLowerCase().includes(q),
+    );
+  }, [options, query]);
+
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className="w-full min-h-12">
+        <SelectValue placeholder={placeholder || 'Selecciona'} />
+      </SelectTrigger>
+      <SelectContent>
+        <div className="p-2 sticky top-0 bg-background">
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar..."
+            className="h-9"
+            onKeyDown={(e) => e.stopPropagation()}
+          />
+        </div>
+        <SelectGroup>
+          {filtered.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
 export default function EditSheetForm<T extends FieldValues>({
   fullWidth = false,
   startButtonContent,
@@ -89,12 +192,19 @@ export default function EditSheetForm<T extends FieldValues>({
   description = 'Modifica tus datos aquí. Guarda los cambios cuando termines.',
   fields,
 }: EditSheetFormProps<T>) {
+  const timeOptions = React.useMemo(() => {
+    const start = dayjs().startOf('day');
+    return Array.from({ length: 24 * 4 }, (_, i) =>
+      start.add(i * 15, 'minute').format('HH:mm'),
+    );
+  }, []);
+
   return (
     <Sheet open={open} onOpenChange={(open: boolean) => setOpen(open)}>
       <SheetTrigger asChild>
         <Button
           className={cn(
-            `${sizeButton === 'default' ? 'h-12 text-sm w-full ' : ''}`,
+            `${sizeButton === 'default' ? 'h-12 text-sm w-full ' : 'h-10'}`,
             `${fullWidth ? 'w-full' : 'sm:w-auto'}`,
           )}
           variant="default"
@@ -113,7 +223,10 @@ export default function EditSheetForm<T extends FieldValues>({
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 px-5">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 px-5 overflow-y-auto mb-4"
+          >
             {fields.map((field) => (
               <FormField
                 key={field.name}
@@ -136,16 +249,27 @@ export default function EditSheetForm<T extends FieldValues>({
                       />
                     )}
 
-                    {field.type === 'time' && (
-                      <Input
+                    {field.type === 'date' && (
+                      <DatePicker
                         id={field.name}
                         placeholder={field.placeholder ?? ''}
-                        type={field.type}
                         className="h-12"
                         value={form.watch(field.name) ?? ''}
-                        onChange={(e) =>
-                          (form as any).setValue(field.name, e.target.value)
+                        maxDate={field.maxDate}
+                        onChange={(dateStr) =>
+                          (form as any).setValue(field.name, dateStr)
                         }
+                      />
+                    )}
+
+                    {field.type === 'time' && (
+                      <SearchableTimeSelect
+                        value={form.watch(field.name) ?? ''}
+                        onValueChange={(value) =>
+                          (form as any).setValue(field.name, value)
+                        }
+                        placeholder={field.placeholder}
+                        options={timeOptions}
                       />
                     )}
 
@@ -160,27 +284,39 @@ export default function EditSheetForm<T extends FieldValues>({
                       />
                     )}
 
-                    {field.type === 'select' && (
-                      <Select
-                        value={form.watch(field.name) ?? ''}
-                        onValueChange={(value) =>
-                          (form as any).setValue(field.name, value)
-                        }
-                      >
-                        <SelectTrigger className="w-full min-h-12">
-                          <SelectValue placeholder={field.placeholder || 'Selecciona'} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {field.options?.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
+                    {field.type === 'select' &&
+                      (field.searchable ? (
+                        <SearchableSelect
+                          value={form.watch(field.name) ?? ''}
+                          onValueChange={(value) =>
+                            (form as any).setValue(field.name, value)
+                          }
+                          placeholder={field.placeholder}
+                          options={field.options}
+                        />
+                      ) : (
+                        <Select
+                          value={form.watch(field.name) ?? ''}
+                          onValueChange={(value) =>
+                            (form as any).setValue(field.name, value)
+                          }
+                        >
+                          <SelectTrigger className="w-full min-h-12">
+                            <SelectValue
+                              placeholder={field.placeholder || 'Selecciona'}
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {field.options?.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      ))}
 
                     {field.type === 'slider' && (
                       <div>

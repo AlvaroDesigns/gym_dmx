@@ -4,7 +4,9 @@ import { Card } from '@/components/ui/card';
 import { FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { dayjs } from '@/lib/dayjs';
 import { FieldValues, UseFormReturn } from 'react-hook-form';
+import { DatePicker } from '../datePicker';
 import {
   Select,
   SelectContent,
@@ -40,7 +42,13 @@ export function PersonalDataForm<T extends FieldValues>({
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="surname">Primer Apellido</Label>
-              <Input className="h-12" type="text" id="surname" {...field} />
+              <Input
+                className="h-12"
+                placeholder="Introduce tu apellido"
+                type="text"
+                id="surname"
+                {...field}
+              />
             </FormItem>
           )}
         />
@@ -50,7 +58,13 @@ export function PersonalDataForm<T extends FieldValues>({
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="lastname">Segundo Apellido</Label>
-              <Input className="h-12" type="text" id="lastname" {...field} />
+              <Input
+                className="h-12"
+                type="text"
+                id="lastname"
+                placeholder="Introduce tu segundo apellido"
+                {...field}
+              />
             </FormItem>
           )}
         />
@@ -60,7 +74,13 @@ export function PersonalDataForm<T extends FieldValues>({
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="dni">DNI</Label>
-              <Input className="h-12" type="text" id="dni" {...field} />
+              <Input
+                className="h-12"
+                type="text"
+                id="dni"
+                placeholder="Introduce tu segundo dni"
+                {...field}
+              />
             </FormItem>
           )}
         />
@@ -70,7 +90,13 @@ export function PersonalDataForm<T extends FieldValues>({
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="email">Email</Label>
-              <Input className="h-12" type="email" id="email" {...field} />
+              <Input
+                className="h-12"
+                type="email"
+                id="email"
+                placeholder="Introduce tu email"
+                {...field}
+              />
             </FormItem>
           )}
         />
@@ -80,7 +106,13 @@ export function PersonalDataForm<T extends FieldValues>({
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="phone">Teléfono</Label>
-              <Input className="h-12" type="text" id="phone" {...field} />
+              <Input
+                className="h-12"
+                type="text"
+                id="phone"
+                placeholder="Introduce tu segundo telefono"
+                {...field}
+              />
             </FormItem>
           )}
         />
@@ -102,6 +134,23 @@ export function PersonalDataForm<T extends FieldValues>({
                   <SelectItem value="F">Femenino</SelectItem>
                 </SelectContent>
               </Select>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="birthDate"
+          render={({ field }) => (
+            <FormItem>
+              <Label>Fecha de Nacimiento</Label>
+              <DatePicker
+                id="birthDate"
+                placeholder="Selecciona una fecha"
+                className="w-full min-h-12"
+                minDate={dayjs().subtract(80, 'year').startOf('day').toDate()}
+                maxDate={dayjs().toDate()}
+                {...field}
+              />
             </FormItem>
           )}
         />

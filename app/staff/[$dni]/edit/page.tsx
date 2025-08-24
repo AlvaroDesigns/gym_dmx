@@ -11,24 +11,13 @@ import { PersonalDataForm } from '@/components/form/PersonalDataForm';
 import { PostalDataForm } from '@/components/form/PostalDataForm';
 import { ProductLayout } from '@/components/layout/product';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FormSchema } from '@/config/schema';
+import { LITERALS } from '@/data/literals';
 import { usePutUsers } from '@/hooks/users/use-put-users';
+import { z } from '@/lib/zod';
+import { ROLES_EMPLOYEE } from '@/types';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import z from 'zod';
-
-const FormSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  surname: z.string().optional(),
-  lastname: z.string().optional(),
-  dni: z.string().min(1, 'DNI is required'),
-  email: z.string().email('Invalid email'),
-  phone: z.string().min(9, 'Phone is required'),
-  gender: z.enum(['M', 'F']),
-  address: z.string().min(1, 'Address is required'),
-  postalCode: z.string().min(1, 'Postal code is required'),
-  province: z.string().min(1, 'Province is required'),
-  country: z.string().min(1, 'Country is required'),
-});
 
 export default function Page() {
   const params = useParams();
@@ -86,24 +75,21 @@ export default function Page() {
         ...data,
         surname: data.surname ?? '',
         lastName: data.lastname ?? '',
-        roles: ['EMPLOYEE'],
+        roles: ROLES_EMPLOYEE,
       },
       {
         onSuccess: () => {
-          console.log('User updated successfully!');
-          // You can add navigation or success message here
-          // router.push('/customers');
+          toast.success(`${LITERALS.STAFF} ${LITERALS.MESSAGES.UPDATE}`);
         },
-        onError: (error) => {
-          console.error('Error updating user:', error);
-          // You can add error handling here
+        onError: () => {
+          toast.error(LITERALS.MESSAGES.ERROR);
         },
       },
     );
   };
 
   return (
-    <ProductLayout isButton={false} isLoading={isLoading}>
+    <ProductLayout isView isButton={false} isLoading={isLoading}>
       <AvatarSections name={data?.name ?? ''} status={false} />
       {/* User */}
       <div className="flex flex-col gap-4  md:gap-6 md:py-2 w-full">

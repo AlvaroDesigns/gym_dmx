@@ -56,6 +56,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
   };
 
   const handleUser = async () => {
+    return await fetch('/api/tools/import-users', { method: 'POST' });
     const res = await fetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -13,6 +13,14 @@ type ClassEvent = RBCEvent & {
   room?: string;
   participants?: number;
   maxCapacity?: number;
+  monitor?: string;
+  participantsList?: Array<{
+    id: string;
+    name: string | null;
+    surname: string | null;
+    instagram?: string | null;
+    tiktok?: string | null;
+  }>;
 };
 
 export function useClasses() {
@@ -26,7 +34,9 @@ export function useClasses() {
       const mapped: ClassEvent[] = data.map((e: CalendarEventDto) => {
         const start = new Date(`${e.date}T${e.startTime}:00`);
         const end = new Date(`${e.date}T${e.endTime}:00`);
+
         return {
+          ...e,
           id: e.id,
           title: e.label,
           description: e.description,
@@ -34,6 +44,7 @@ export function useClasses() {
           room: e.room,
           participants: e.participants,
           maxCapacity: e.maxCapacity,
+          participantsList: e.participantsList,
           allDay: false,
           start,
           end,

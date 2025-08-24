@@ -59,6 +59,19 @@ export interface EditSheetFormProps<T extends FieldValues = FieldValues> {
   onSubmit?: (data: T) => void;
   fields?: FieldConfig<T>[]; // opcional y no usado por ahora
   label?: string; // opcional
+  data?: {
+    room?: string;
+    startTime?: string;
+    endTime?: string;
+    monitor?: string;
+    participantsList?: Array<{
+      id: string;
+      name: string | null;
+      surname: string | null;
+      instagram?: string | null;
+      tiktok?: string | null;
+    }>;
+  };
 }
 
 export default function BookingSheetForm<T extends FieldValues>({
@@ -67,11 +80,14 @@ export default function BookingSheetForm<T extends FieldValues>({
   open,
   setOpen,
   label,
+  data,
 }: EditSheetFormProps<T>) {
   // Modo controlado si se pasan open y setOpen; si no, modo no controlado con estado interno
   const isControlled = typeof open === 'boolean' && typeof setOpen === 'function';
   const [internalOpen, setInternalOpen] = useState(false);
   const actualOpen = isControlled ? (open as boolean) : internalOpen;
+
+  const { room, endTime, startTime, monitor, participantsList } = data || {};
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (isControlled) {
@@ -81,10 +97,7 @@ export default function BookingSheetForm<T extends FieldValues>({
     }
   };
 
-  const USER = {
-    name: 'Placeholder User',
-  };
-
+  console.log('eeeeee', Array.isArray(participantsList) && participantsList.length > 0);
   return (
     <Sheet open={actualOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -107,22 +120,22 @@ export default function BookingSheetForm<T extends FieldValues>({
               <div className="flex gap-4 items-center">
                 <Avatar className="h-16 w-16">
                   <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>{USER.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{monitor?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-2">
                   <span className="text-[16px] leading-none font-semibold">
-                    {USER.name}
+                    {monitor}
                   </span>
                   <div className="flex flex-row items-center gap-2">
                     <ClockIcon className="w-5 h-5 text-black" />
                     <span className="text-md leading-none text-muted-foreground">
-                      18:00 - 19:00
+                      {startTime} - {endTime}
                     </span>
                   </div>
                   <div className="flex flex-row items-center gap-2">
                     <MapPinIcon className="w-5 h-5 text-black" />
                     <span className="text-md leading-none text-muted-foreground">
-                      Sala 1
+                      {room}
                     </span>
                   </div>
                 </div>
@@ -130,15 +143,38 @@ export default function BookingSheetForm<T extends FieldValues>({
             </div>
           </div>
           <Separator className="my-4" />
+          {Array.isArray(participantsList) && participantsList.length > 0 && (
+            <div className="px-4 pb-4">
+              <h3 className="font-semibold mb-2">Participantes</h3>
+              <ul className="flex flex-col gap-3">
+                {participantsList.map((p) => (
+                  <li key={p.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>
+                          {(p.name || p.surname || '?').toString().charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">
+                        {[p.name, p.surname].filter(Boolean).join(' ') || 'Sin nombre'}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <ParticipantList participantsList={participantsList} />
         </div>
 
         <SheetFooter>
           <Button className="h-12" type="submit">
-            Guardad Cambios
+            Reservar
           </Button>
           <SheetClose asChild>
-            <Button className="h-12" variant="outline">
-              Cerrar
+            <Button className="h-12" variant="outline" disabled>
+              Cancelar
             </Button>
           </SheetClose>
         </SheetFooter>
@@ -146,3 +182,17 @@ export default function BookingSheetForm<T extends FieldValues>({
     </Sheet>
   );
 }
+
+const ParticipantList = ({
+  participantsList,
+}: {
+  participantsList: Array<{
+    id: string;
+    name: string | null;
+    surname: string | null;
+    instagram?: string | null;
+    tiktok?: string | null;
+  }>;
+}) => {
+  return <div>ParticipantList {participantsList?.length}</div>;
+};

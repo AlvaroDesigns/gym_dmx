@@ -2,7 +2,8 @@
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { useClasses } from '@/hooks/useClasses';
 import { cn } from '@/lib/utils';
-import dayjs from 'dayjs';
+
+import { dayjs } from '@/lib/dayjs';
 import 'dayjs/locale/es';
 import { Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -23,6 +24,14 @@ interface ClassEvent {
   endTime?: string;
   participants?: number;
   maxCapacity?: number;
+  monitor?: string;
+  participantsList?: Array<{
+    id: string;
+    name: string | null;
+    surname: string | null;
+    instagram?: string | null;
+    tiktok?: string | null;
+  }>;
 }
 
 interface DateStripProps {
@@ -44,7 +53,7 @@ export default function DateStripTabs({
   const [filter, setFilter] = useState('');
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const { events, isLoading, loadEvents, refreshEvents } = useClasses();
+  const { events, loadEvents } = useClasses();
 
   const monthName = selectedDate.format('MMMM YYYY');
 
@@ -69,8 +78,44 @@ export default function DateStripTabs({
     loadEvents(startDate, endDate);
   }, [currentWeekStart, loadEvents]);
 
+  type HookEvent = {
+    id: string;
+    title: string;
+    start: Date;
+    end: Date;
+    color?: string;
+    description?: string;
+    room?: string;
+    participants?: number;
+    maxCapacity?: number;
+    monitor?: string;
+    participantsList?: Array<{
+      id: string;
+      name: string | null;
+      surname: string | null;
+      instagram?: string | null;
+      tiktok?: string | null;
+    }>;
+  };
+
+  const mappedEvents: ClassEvent[] = events.map((e: HookEvent) => ({
+    id: e.id,
+    date: dayjs(e.start).format('YYYY-MM-DD'),
+    label: e.title,
+    color: e.color,
+    description: e.description,
+    room: e.room,
+    startTime: dayjs(e.start).format('HH:mm'),
+    endTime: dayjs(e.end).format('HH:mm'),
+    participants: e.participants,
+    maxCapacity: e.maxCapacity,
+    monitor: e.monitor,
+    participantsList: e.participantsList || [],
+    // monitor lo propagamos dentro de data al abrir la ficha
+  }));
+
   const selectedDayClasses = classesPerDay
-    .concat(events)
+    .concat(mappedEvents)
     .filter((c) => c.date === selectedDate.format('YYYY-MM-DD'));
 
   const filteredClasses = selectedDayClasses.filter((c) => {
@@ -86,7 +131,7 @@ export default function DateStripTabs({
     selectedDayClasses.length === 0
       ? 'No hay clases este día'
       : 'No hay clases que coincidan con el filtro';
-
+  console.log('filteredClasses', filteredClasses);
   return (
     <div className="w-full max-w-lg mx-auto">
       {/* Header con navegación */}
@@ -164,11 +209,12 @@ export default function DateStripTabs({
       </div>
 
       {/* Contenido tipo Tabs */}
-      <div className="mt-4 px-4  rounded-xl dark:bg-[#0f1623]">
+      <div className="mt-4 px-4 rounded-xl dark:bg-[#0f1623]">
         {filteredClasses.length > 0 ? (
           filteredClasses.map((cls, i) => (
             <BookingSheetForm
-              {...cls}
+              data={cls}
+              label={cls.label}
               key={`${cls.date}-${i}`}
               open={openIndex === i}
               setOpen={(o: boolean) => setOpenIndex(o ? i : null)}
@@ -176,32 +222,38 @@ export default function DateStripTabs({
               <Card
                 className={cn(
                   'p-2 mb-4 rounded-lg text-sm flex justify-center',
-                  'px-6 py-2 min-h-24',
+                  'px-6 py-2 min-h-16',
+                  `${cls.color}`,
                 )}
                 style={{
                   borderLeftWidth: '8px',
-                  borderLeftColor: cls.color || '#3b82f6',
                 }}
               >
-                <div className="flex flex-col gap-2">
-                  <span className="text-md leading-none text-muted-foreground mt-2">
-                    {cls.startTime && cls.endTime
-                      ? `${cls.startTime} - ${cls.endTime}`
-                      : '08:00 - 10:00'}
-                  </span>
-                  <h2 className="text-[22px] leading-none font-semibold uppercase">
-                    {cls.label}
-                  </h2>
-                  {cls.room && (
-                    <span className="text-sm text-muted-foreground">
-                      Sala: {cls.room}
+                <div className="flex flex-row gap-2 justify-between w-full items-start">
+                  <div>
+                    <span className="text-md leading-none text-muted-foreground mt-2">
+                      {cls.startTime && cls.endTime
+                        ? `${cls.startTime} - ${cls.endTime}`
+                        : '08:00 - 10:00'}
                     </span>
+                    <h2 className="text-[20px] leading-none font-semibold uppercase">
+                      {cls.label}
+                    </h2>
+                  </div>
+                  {dayjs().isAfter(dayjs(`${cls.date}T${cls.endTime || '10:00'}:00`)) && (
+                    <div className="mt-2 flex justify-end gap-2 text-s text-muted-foreground">
+                      <div className="bg-gray-200 text-gray-500 dark:bg-gray-200 px-2 py-0.5 rounded-md">
+                        Finalizada
+                      </div>
+                    </div>
                   )}
                 </div>
                 {cls.description && <p className="mt-1">{cls.description}</p>}
                 {cls.participants && cls.maxCapacity && (
                   <div className="mt-2 flex justify-end gap-2 text-s text-muted-foreground">
-                    {cls.participants}/{cls.maxCapacity} participantes
+                    <div className="bg-blue-500 text-white dark:bg-blue-600 px-2 py-0.5 rounded-md">
+                      {cls.participants}/{cls.maxCapacity} participantes
+                    </div>
                   </div>
                 )}
               </Card>

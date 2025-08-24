@@ -51,10 +51,7 @@ const PAYMENTS: Payment[] = [
 
 export default function Page() {
   return (
-    <ProductLayout
-      buttonProps={{ text: 'Añadir Pago', routingUri: 'modal' }}
-      isView={false}
-    >
+    <ProductLayout buttonProps={{ text: 'Añadir Pago', routingUri: 'modal' }}>
       <SimpleDataTable
         data={PAYMENTS}
         columns={columns}

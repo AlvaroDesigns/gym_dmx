@@ -55,28 +55,6 @@ export interface EditSheetFormProps<T extends FieldValues = FieldValues> {
   label?: string; // opcional
 }
 
-const COLORS = [
-  'bg-green-500 text-white',
-  'bg-yellow-500 text-black',
-  'bg-red-500 text-white',
-  'bg-blue-500 text-white',
-  'bg-purple-500 text-white',
-  'bg-pink-500 text-white',
-  'bg-gray-500 text-white',
-  'bg-neutral-500 text-white',
-  'bg-stone-500 text-white',
-  'bg-emerald-500 text-white',
-  'bg-teal-500 text-white',
-  'bg-cyan-500 text-white',
-  'bg-sky-500 text-white',
-  'bg-lime-500 text-white',
-  'bg-rose-500 text-white',
-  'bg-fuchsia-500 text-white',
-  'bg-amber-500 text-black',
-  'bg-red-500 text-white',
-  'bg-green-500 text-white',
-];
-
 export default function DateSheetForm<T extends FieldValues>({
   fullWidth = false,
   children,
@@ -99,7 +77,7 @@ export default function DateSheetForm<T extends FieldValues>({
   }, []);
 
   const { data, isLoading, error } = useGetEvents({ startDate, endDate });
-  console.log(data);
+
   const handleOpenChange = (nextOpen: boolean) => {
     if (isControlled) {
       (setOpen as (o: boolean) => void)(nextOpen);
@@ -107,7 +85,7 @@ export default function DateSheetForm<T extends FieldValues>({
       setInternalOpen(nextOpen);
     }
   };
-
+  console.log('datadatadatadatadata', data);
   return (
     <Sheet open={actualOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -119,13 +97,15 @@ export default function DateSheetForm<T extends FieldValues>({
         <DateStrip
           classesPerDay={data?.map((cls, index) => ({
             id: `${cls.date}-${index}`,
-            color: COLORS[index % COLORS.length],
+            color: `border-l-${cls.color}`,
             date: dayjs(cls.date).format('YYYY-MM-DD'),
             label: cls.label,
             participants: cls.participants,
             maxCapacity: cls.maxCapacity,
             startTime: cls.startTime,
             endTime: cls.endTime,
+            room: cls.room,
+            monitor: cls.monitor,
           }))}
         />
       </SheetContent>

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { TAILWIND_HEX_COLORS } from '@/config/colors';
 import { LITERALS } from '@/data/literals';
 import { getEditFieldsModalZones } from '@/data/modals';
 import { useDeleteClass } from '@/hooks/class/use-delete-class';
@@ -29,7 +30,9 @@ import {
 
 interface ClassSectionProps {
   id: string;
-  name: string;
+  classId: number;
+  color?: string;
+  name?: string;
   description: string;
   maxCapacity: number;
   room: string;
@@ -51,33 +54,10 @@ const FormZonesSchema = z.object({
   imageUrl: z.string().url('Debe ser una URL válida').optional().or(z.literal('')),
 });
 
-const COLORS = {
-  0: 'border-l-fuchsia-100',
-  1: 'border-l-amber-100',
-  2: 'border-l-red-100',
-  3: 'border-l-green-100',
-  4: 'border-l-blue-100',
-  5: 'border-l-purple-100',
-  6: 'border-l-pink-100',
-  7: 'border-l-yellow-100',
-  8: 'border-l-gray-100',
-  9: 'border-l-neutral-100',
-  10: 'border-l-stone-100',
-  11: 'border-l-emerald-100',
-  12: 'border-l-teal-100',
-  13: 'border-l-cyan-100',
-  14: 'border-l-sky-100',
-  15: 'border-l-lime-100',
-  16: 'border-l-rose-100',
-  17: 'border-l-fuchsia-100',
-  18: 'border-l-amber-100',
-  19: 'border-l-red-100',
-  20: 'border-l-green-100',
-  21: 'border-l-blue-100',
-};
-
 export const IntegrationCard = ({
   id,
+  color,
+  classId,
   name,
   description,
   maxCapacity,
@@ -168,12 +148,15 @@ export const IntegrationCard = ({
       toast.error(error instanceof Error ? error.message : 'Error al eliminar la zona');
     }
   };
-
+  console.log(TAILWIND_HEX_COLORS[color as keyof typeof TAILWIND_HEX_COLORS]);
   return (
     <Card
+      style={{
+        borderLeft: `16px solid ${TAILWIND_HEX_COLORS[color as keyof typeof TAILWIND_HEX_COLORS]}`,
+      }}
       className={cn(
         'px-6 py-2',
-        `${type === 'classes' ? `border-l-16 ${COLORS[index as keyof typeof COLORS]}` : 'pb-5'}`,
+        `${type === 'classes' ? `border-l-16 border-l-${color} ` : 'pb-5'}`,
       )}
     >
       <div className={`relative flex flex-row gap-4`}>

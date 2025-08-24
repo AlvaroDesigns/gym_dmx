@@ -36,7 +36,7 @@ interface ProductLayoutProps {
 export const ProductLayout = ({
   children,
   isLoading = false,
-  isView = true,
+  isView = false,
   buttonProps,
   customButton,
   onChangeView,

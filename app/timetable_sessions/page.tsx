@@ -3,6 +3,7 @@
 import EditSheetForm from '@/components/form/EditSheetForm';
 import GymCalendar from '@/components/gym-calendar';
 import { ProductLayout } from '@/components/layout/product';
+import { RANGE_DAYS_FOR_CALENDAR } from '@/config/configuration';
 import { LITERALS } from '@/data/literals';
 import { getFieldsModalCalendar } from '@/data/modals';
 import { useGetEvents } from '@/hooks/events/use-get-events';
@@ -35,7 +36,7 @@ export default function Page() {
 
   const { startDate, endDate } = useMemo(() => {
     const start = dayjs().startOf('week');
-    const end = start.add(6, 'day');
+    const end = start.add(RANGE_DAYS_FOR_CALENDAR, 'day');
     return {
       startDate: start.format('YYYY-MM-DD'),
       endDate: end.format('YYYY-MM-DD'),
@@ -60,7 +61,10 @@ export default function Page() {
 
   const handleCreateClass = (data: ClassFormValues) => {
     createCalendarMutation.mutate(
-      { ...data },
+      {
+        ...data,
+        maxCapacity: Number(data.maxCapacity),
+      },
       {
         onSuccess: () => {
           toast.success(`${LITERALS.CLASS} ${LITERALS.MESSAGES.CREATE}`);

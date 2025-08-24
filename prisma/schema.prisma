@@ -26,6 +26,8 @@ model User {
   name          String
   surname       String
   password      String
+  instagram     String?
+  tiktok        String?
   payments      Payment[]
   classes       UserClass[]
 }
@@ -37,6 +39,8 @@ model Class {
   maxCapacity Int
   room        String
   zoneId      String?
+  color       String?
+  classId     Int             @default(autoincrement())
   zone        Zone?           @relation(fields: [zoneId], references: [id])
   schedules   ClassSchedule[]
   userClasses UserClass[]

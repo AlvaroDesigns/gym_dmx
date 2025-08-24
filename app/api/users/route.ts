@@ -70,20 +70,26 @@ export async function POST(request: Request) {
       );
     }
     const hashedPassword = await hash('Test123', 10);
+    const provinciaValue = body.provincia ?? body.province ?? '';
+    let birthDateValue = body.birthDate ? new Date(body.birthDate) : new Date();
+    if (isNaN(birthDateValue.getTime())) {
+      birthDateValue = new Date();
+    }
+
     const user = await prisma.user.create({
       data: {
         name: body.name,
         surname: body.surname,
         lastName: body.lastname,
-        birthDate: new Date(body.birthDate), // Default date, you might want to add this to the form
+        birthDate: birthDateValue,
         gender: body.gender as Gender,
         dni: body.dni,
         phone: body.phone,
         postalCode: body.postalCode,
         address: body.address,
-        city: body.provincia, // Using provincia as city
+        city: body.city ?? provinciaValue ?? '',
         country: body.country,
-        province: body.provincia,
+        province: provinciaValue,
         email: body.email,
         password: hashedPassword,
         roles: body.roles || [Role.USER],
@@ -208,6 +214,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const roles = searchParams.get('roles');
     const doc = searchParams.get('dni');
+    const email = searchParams.get('email');
 
     // Construir filtro dinámico
     const where: any = {};
@@ -218,6 +225,10 @@ export async function GET(request: Request) {
 
     if (doc) {
       where.dni = doc;
+    }
+
+    if (email) {
+      where.email = { contains: email, mode: 'insensitive' };
     }
 
     const users = await prisma.user.findMany({

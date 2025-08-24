@@ -22,17 +22,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useGetUsers } from '@/hooks/users/use-get-users';
 import { ClockIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { Fragment } from 'react';
-
-const USER = {
-  name: 'Álvaro Saiz Bonilla',
-  staff: 'Supervisor, Comunicación',
-  email: 'alvaro.saiz.bonilla@gmail.com',
-  dni: '12345678J',
-  image: 'https://github.com/shadcn.png',
-};
 
 const CLASS = [
   {
@@ -53,6 +46,12 @@ const CLASS = [
 ];
 
 export default function Page() {
+  const { data } = useGetUsers({
+    email: 'hello@alvarodesigns.com',
+  });
+
+  const user = data?.[0];
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
@@ -61,11 +60,11 @@ export default function Page() {
           <div className="flex gap-4 items-center">
             <Avatar className="h-19 w-19">
               <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>{USER.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col gap-2">
               <h2 className="text-[20px] leading-none font-semibold">
-                ¡Hola {USER.name}!
+                ¡Hola {user?.name} {user?.surname}!
               </h2>
               <div className="flex flex-col gap-1">
                 <span className="text-md leading-none text-muted-foreground">
@@ -126,11 +125,11 @@ export default function Page() {
                         <div className="flex gap-4 items-center">
                           <Avatar className="h-16 w-16">
                             <AvatarImage src="https://github.com/shadcn.png" />
-                            <AvatarFallback>{USER.name.charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col gap-2">
                             <span className="text-[16px] leading-none font-semibold">
-                              {USER.name}
+                              {user?.name}
                             </span>
                             <div className="flex flex-row items-center gap-2">
                               <ClockIcon className="w-5 h-5 text-black" />

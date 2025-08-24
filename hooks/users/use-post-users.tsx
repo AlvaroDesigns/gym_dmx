@@ -1,8 +1,6 @@
 import { postUsers } from '@/app/gen/postClients';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export type RolesType = 'ADMIN' | 'USER' | 'EMPLOYEE';
-
 export function usePostUsers() {
   const qc = useQueryClient();
   return useMutation({

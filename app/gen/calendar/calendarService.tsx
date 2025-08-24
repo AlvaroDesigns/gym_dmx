@@ -19,6 +19,14 @@ export interface CalendarEventDto {
   endTime: string; // HH:MM
   participants: number;
   maxCapacity: number;
+  monitor?: string;
+  participantsList?: Array<{
+    id: string;
+    name: string | null;
+    surname: string | null;
+    instagram?: string | null;
+    tiktok?: string | null;
+  }>;
 }
 
 export async function getCalendar(

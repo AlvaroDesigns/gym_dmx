@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const events = await prisma.userClass.findMany({
+    const userClasses = await prisma.userClass.findMany({
       where: {
         date: {
           gte: new Date(startDate),
@@ -26,26 +26,64 @@ export async function GET(request: NextRequest) {
         class: true,
         user: {
           select: {
+            id: true,
             name: true,
             surname: true,
+            instagram: true,
+            tiktok: true,
+            roles: true,
           },
         },
       },
     });
 
-    // Transformar los datos para el calendario
-    const calendarEvents = events.map((event) => ({
-      id: event.id,
-      date: event.date.toISOString().split('T')[0], // YYYY-MM-DD
-      label: event.class.name,
-      description: event.class.description,
-      color: '#3b82f6',
-      room: event.class.room,
-      startTime: event.date.toTimeString().slice(0, 5), // HH:MM
-      endTime: new Date(event.date.getTime() + 60 * 60 * 1000).toTimeString().slice(0, 5), // +1 hora
-      participants: 1,
-      maxCapacity: event.class.maxCapacity,
-    }));
+    // Agrupar por ocurrencia de clase (classId + fecha-hora exacta)
+    const grouped = new Map<string, typeof userClasses>();
+    for (const uc of userClasses) {
+      const key = `${uc.classId}__${uc.date.toISOString()}`;
+      const list = grouped.get(key) || [];
+      list.push(uc);
+      grouped.set(key, list);
+    }
+
+    const calendarEvents = Array.from(grouped.entries()).map(([key, list]) => {
+      const first = list[0];
+      const startIso = first.date.toISOString();
+      const startTime = first.date.toTimeString().slice(0, 5);
+      const endTime = new Date(first.date.getTime() + 60 * 60 * 1000)
+        .toTimeString()
+        .slice(0, 5);
+      const monitorUser = list.find(
+        (uc) => uc.user.roles.includes('EMPLOYEE') || uc.user.roles.includes('ADMIN'),
+      );
+      const monitorName = monitorUser
+        ? [monitorUser.user.name, monitorUser.user.surname].filter(Boolean).join(' ')
+        : undefined;
+      const participantsList = list
+        .map((i) => ({
+          id: i.user.id,
+          name: i.user.name,
+          surname: i.user.surname,
+          instagram: i.user.instagram,
+          tiktok: i.user.tiktok,
+        }))
+        .filter((u) => !!u.id);
+
+      return {
+        id: key,
+        date: startIso.split('T')[0],
+        label: first.class.name,
+        description: first.class.description,
+        color: first.class.color,
+        room: first.class.room,
+        monitor: monitorName,
+        startTime,
+        endTime,
+        participants: participantsList.length,
+        maxCapacity: first.class.maxCapacity,
+        participantsList,
+      };
+    });
 
     return NextResponse.json(calendarEvents);
   } catch (error) {

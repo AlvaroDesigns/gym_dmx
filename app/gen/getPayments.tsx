@@ -1,6 +1,5 @@
+import { RolesType } from '@/types';
 import axios, { AxiosRequestConfig } from 'axios';
-
-type RolesType = 'ADMIN' | 'USER';
 
 interface UserType {
   lastName: string;

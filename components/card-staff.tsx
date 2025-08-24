@@ -86,7 +86,7 @@ const TestimonialCard = ({
   return (
     <>
       <Card className="relative w-full flex flex-row bg-background shadow border-none">
-        <CardContent className="flex flex-col gap-4 px-6 w-full sm:flex-row">
+        <CardContent className="flex flex-row gap-4 px-6 w-full">
           <div className="flex items-center gap-3 w-full">
             <Avatar className="h-16 w-16 sm:h-18 sm:w-18">
               <AvatarImage src="https://github.com/shadcn.png" />
@@ -106,12 +106,12 @@ const TestimonialCard = ({
             </div>
           </div>
           <div className="flex flex-row">
-            <div className="flex-1 sm:flex flex-col gap-2 border-l border-gray-300 px-6 justify-center hidden">
+            <div className="flex-1 flex-col gap-2 border-l border-gray-300 px-6 justify-center hidden">
               <p className="text-sm leading-none text-muted-foreground">Estado</p>
               <Switch />
             </div>
 
-            <div className=" flex flex-row sm:flex-col gap-2 sm:border-l border-gray-300 px-6 justify-center">
+            <div className="flex flex-col gap-2 border-l border-gray-300 px-6 justify-center">
               {editable ? (
                 <Button className="h-12 text-sm" variant="default" onClick={onClick}>
                   Editar

@@ -48,6 +48,7 @@ export default function Page() {
 
   return (
     <ProductLayout
+      isView
       onChangeView={handleProductLayoutViewChange}
       view={currentView}
       buttonProps={{

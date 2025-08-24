@@ -14,6 +14,8 @@ export interface UserData {
   country: string;
   roles?: Role[];
   password?: string;
+  instagram?: string | null;
+  tiktok?: string | null;
 }
 
 export interface UserUpdateData {
@@ -31,4 +33,6 @@ export interface UserUpdateData {
   email?: string;
   roles?: Role[];
   password?: string;
+  instagram?: string | null;
+  tiktok?: string | null;
 }
