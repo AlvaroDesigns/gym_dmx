@@ -8,6 +8,7 @@ import { getFieldsModalZones } from '@/data/modals';
 import { useGetZones } from '@/hooks/zones/use-get-zones';
 import { useCreateZone } from '@/hooks/zones/use-zones';
 import { ZONE_TYPE, ZoneData } from '@/types';
+import { IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -59,6 +60,7 @@ export default function Page() {
           form={formClass}
           onSubmit={onSubmitClass}
           sizeButton="sm"
+          startButtonContent={<IconPlus />}
           triggerText="Añadir zonas"
           title="Crear nueva zonas"
           description="Añade una nueva zona. Completa los campos y guarda los cambios."

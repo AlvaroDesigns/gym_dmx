@@ -9,6 +9,7 @@ import { getFieldsModalCalendar } from '@/data/modals';
 import { useGetEvents } from '@/hooks/events/use-get-events';
 import { usePostEvents } from '@/hooks/events/use-post-events';
 import { useGetMaestres } from '@/hooks/use-get-maesters';
+import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -94,6 +95,7 @@ export default function Page() {
           form={formClass}
           onSubmit={onSubmitClass}
           sizeButton="sm"
+          startButtonContent={<IconPlus />}
           triggerText="Añadir actividades"
           title="Crear nueva actividad"
           description="Añade una nueva actividad. Completa los campos y guarda los cambios."

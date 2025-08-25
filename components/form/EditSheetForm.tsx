@@ -204,7 +204,7 @@ export default function EditSheetForm<T extends FieldValues>({
       <SheetTrigger asChild>
         <Button
           className={cn(
-            `${sizeButton === 'default' ? 'h-12 text-sm w-full ' : 'h-10'}`,
+            `${sizeButton === 'default' ? 'h-10 text-sm w-full ' : 'h-8'}`,
             `${fullWidth ? 'w-full' : 'sm:w-auto'}`,
           )}
           variant="default"

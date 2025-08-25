@@ -12,6 +12,7 @@ import { useViewToggle } from '@/hooks/use-view-toggle';
 
 import { LITERALS } from '@/data/literals';
 import { CLASS_TYPE, ClassData } from '@/types';
+import { IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -30,7 +31,6 @@ export default function Page() {
   );
 
   const handleProductLayoutViewChange = (value: 'default' | 'compiled') => {
-    console.log('Cambió a vista:', value);
     handleViewChange(value);
   };
 
@@ -79,6 +79,7 @@ export default function Page() {
           form={formClass}
           onSubmit={onSubmitClass}
           sizeButton="sm"
+          startButtonContent={<IconPlus />}
           triggerText="Añadir actividades"
           title="Crear nueva actividad"
           description="Añade una nueva actividad. Completa los campos y guarda los cambios."

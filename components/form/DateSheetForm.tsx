@@ -96,16 +96,10 @@ export default function DateSheetForm<T extends FieldValues>({
         </SheetHeader>
         <DateStrip
           classesPerDay={data?.map((cls, index) => ({
+            ...cls,
             id: `${cls.date}-${index}`,
             color: `border-l-${cls.color}`,
             date: dayjs(cls.date).format('YYYY-MM-DD'),
-            label: cls.label,
-            participants: cls.participants,
-            maxCapacity: cls.maxCapacity,
-            startTime: cls.startTime,
-            endTime: cls.endTime,
-            room: cls.room,
-            monitor: cls.monitor,
           }))}
         />
       </SheetContent>

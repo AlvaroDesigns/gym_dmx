@@ -1,11 +1,11 @@
 'use client';
 
+import { dayjs } from '@/lib/dayjs';
 import { format } from 'date-fns/format';
 import { getDay } from 'date-fns/getDay';
 import { es } from 'date-fns/locale';
 import { parse } from 'date-fns/parse';
 import { startOfWeek } from 'date-fns/startOfWeek';
-import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import { Calendar, dateFnsLocalizer, Event } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -28,52 +28,16 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const CLASS = [
-  {
-    class: 'Trx',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.',
-    maxCapacity: 10,
-    instructor: 'Diego Mena(ART)',
-    room: 'Zona Funcional',
-  },
-  {
-    class: '100% Superior',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.',
-    instructor: 'Álvaro Saiz (BOT)',
-    maxCapacity: 20,
-    room: 'Estudio 1',
-  },
-  {
-    class: 'Gap',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.',
-    instructor: 'Javier Sete (BRT)',
-    maxCapacity: 20,
-    room: 'Zona Funcional',
-  },
-  {
-    class: 'Pialtes',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.',
-    instructor: 'Javier Sete (BRT)',
-    maxCapacity: 20,
-    room: 'Estudio Zen',
-  },
-  {
-    class: 'Cycling',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.',
-    instructor: 'Javier Sete (BRT)',
-    maxCapacity: 20,
-    room: 'Estudio Cycling',
-  },
-];
-
 interface GymCalendarProps {
   data?: CalendarEventDto[];
 }
+
+type RBCEvent = Event & {
+  monitor?: string;
+  resource?: any;
+  color?: string;
+  description?: string;
+};
 
 export default function GymCalendar({ data }: GymCalendarProps) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -124,6 +88,7 @@ export default function GymCalendar({ data }: GymCalendarProps) {
   }, [autoOpenDialog, selectedSlot]);
 
   const handleAddEvent = async () => {
+    alert('add event');
     if (!formData.title || !selectedSlot) return;
 
     setIsSubmitting(true);
@@ -209,7 +174,7 @@ export default function GymCalendar({ data }: GymCalendarProps) {
       allDay: false,
     }));
   }, [data]);
-  console.log('propEvents', propEvents);
+
   // Cargar eventos automáticamente solo si no se proporcionan por props
   useEffect(() => {
     if (propEvents) return;
@@ -233,11 +198,12 @@ export default function GymCalendar({ data }: GymCalendarProps) {
       <Card className="p-4">
         <Calendar
           localizer={localizer}
+          culture="es"
           events={propEvents ?? events ?? []}
           defaultView="week"
           views={['week', 'day']}
           date={selectedDate.toDate()}
-          onNavigate={(newDate) => {
+          onNavigate={(newDate: Date) => {
             const base = dayjs(newDate);
             setSelectedDate(base);
             setCurrentWeekStart(base.startOf('week'));
@@ -263,7 +229,7 @@ export default function GymCalendar({ data }: GymCalendarProps) {
             agenda: 'Agenda',
           }}
           components={{
-            event: ({ event }: { event: any }) => {
+            event: ({ event }: { event: RBCEvent }) => {
               const monitor = event?.monitor ?? '';
               const time = `${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`;
               console.log('events', event);

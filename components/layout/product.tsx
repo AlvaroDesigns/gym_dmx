@@ -1,5 +1,6 @@
 import { getFieldsModalZones } from '@/data/modals';
 import { useCreateZone } from '@/hooks/zones/use-zones';
+import { CLASS_TYPE, ZONE_TYPE } from '@/types';
 import { IconAdjustmentsPlus, IconLayoutColumns, IconPlus } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -51,7 +52,7 @@ export const ProductLayout = ({
   const { type } = buttonProps || {};
 
   const normalizedType =
-    type === 'class' ? 'classes' : type === 'zone' ? 'zones' : undefined;
+    type === 'class' ? CLASS_TYPE : type === 'zone' ? ZONE_TYPE : undefined;
   const fields = normalizedType ? getFieldsModalZones(normalizedType) : [];
 
   return (

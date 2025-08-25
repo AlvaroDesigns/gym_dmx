@@ -13,6 +13,7 @@ import Image from 'next/image';
 
 import { FieldValues, Path } from 'react-hook-form';
 
+import type { ClassEvent } from '@/types';
 import { ClockIcon, MapPinIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
@@ -59,23 +60,13 @@ export interface EditSheetFormProps<T extends FieldValues = FieldValues> {
   onSubmit?: (data: T) => void;
   fields?: FieldConfig<T>[]; // opcional y no usado por ahora
   label?: string; // opcional
-  data?: {
-    room?: string;
-    startTime?: string;
-    endTime?: string;
-    monitor?: string;
-    participantsList?: Array<{
-      id: string;
-      name: string | null;
-      surname: string | null;
-      instagram?: string | null;
-      tiktok?: string | null;
-    }>;
-  };
+  data?: Pick<
+    ClassEvent,
+    'room' | 'startTime' | 'endTime' | 'monitor' | 'participantsList'
+  >;
 }
 
 export default function BookingSheetForm<T extends FieldValues>({
-  fullWidth = false,
   children,
   open,
   setOpen,
@@ -97,7 +88,6 @@ export default function BookingSheetForm<T extends FieldValues>({
     }
   };
 
-  console.log('eeeeee', Array.isArray(participantsList) && participantsList.length > 0);
   return (
     <Sheet open={actualOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -143,29 +133,8 @@ export default function BookingSheetForm<T extends FieldValues>({
             </div>
           </div>
           <Separator className="my-4" />
-          {Array.isArray(participantsList) && participantsList.length > 0 && (
-            <div className="px-4 pb-4">
-              <h3 className="font-semibold mb-2">Participantes</h3>
-              <ul className="flex flex-col gap-3">
-                {participantsList.map((p) => (
-                  <li key={p.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>
-                          {(p.name || p.surname || '?').toString().charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm">
-                        {[p.name, p.surname].filter(Boolean).join(' ') || 'Sin nombre'}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <ParticipantList participantsList={participantsList} />
+
+          <ParticipantList participantsList={data?.participantsList} />
         </div>
 
         <SheetFooter>
@@ -183,16 +152,28 @@ export default function BookingSheetForm<T extends FieldValues>({
   );
 }
 
-const ParticipantList = ({
-  participantsList,
-}: {
-  participantsList: Array<{
-    id: string;
-    name: string | null;
-    surname: string | null;
-    instagram?: string | null;
-    tiktok?: string | null;
-  }>;
-}) => {
-  return <div>ParticipantList {participantsList?.length}</div>;
+const ParticipantList = ({ participantsList }: Pick<ClassEvent, 'participantsList'>) => {
+  const list = Array.isArray(participantsList) ? participantsList : [];
+
+  if (list.length === 0) return null;
+
+  return (
+    <div className="px-4 pb-4">
+      <ul className="grid grid-cols-4 gap-3">
+        {list.map((p) => (
+          <li key={p.id} className="flex items-center justify-center">
+            <Avatar
+              className="h-12 w-12"
+              title={[p.name, p.surname].filter(Boolean).join(' ') || 'Sin nombre'}
+            >
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>
+                {(p.name || p.surname || '?').toString().charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };

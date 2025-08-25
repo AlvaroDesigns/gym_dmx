@@ -21,3 +21,26 @@ export interface ZoneData {
   description?: string;
   imageUrl?: string;
 }
+
+export interface ParticipantData {
+  id: string;
+  name: string | null;
+  surname: string | null;
+  instagram?: string | null;
+  tiktok?: string | null;
+}
+
+export interface ClassEvent {
+  id: string;
+  date: string; // formato YYYY-MM-DD
+  label: string;
+  color?: string;
+  description?: string;
+  room?: string;
+  startTime?: string;
+  endTime?: string;
+  participants?: number;
+  maxCapacity?: number;
+  monitor?: string;
+  participantsList?: Array<ParticipantData>;
+}

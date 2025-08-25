@@ -8,7 +8,7 @@ declare module 'react-big-calendar' {
     allDay: boolean;
     id?: string;
     color?: string;
-    instructor?: string;
+    monitor?: string;
     room?: string;
     maxCapacity?: number;
     description?: string;
@@ -19,9 +19,12 @@ declare module 'react-big-calendar' {
     events: Event[];
     defaultView?: string;
     views?: string[];
+    date?: Date;
+    culture?: string;
     selectable?: boolean;
     onSelectSlot?: (slotInfo: { start: Date; end: Date }) => void;
     onSelectEvent?: (event: Event) => void;
+    onNavigate?: (newDate: Date) => void;
     startAccessor: string;
     endAccessor: string;
     style?: React.CSSProperties;
@@ -32,6 +35,7 @@ declare module 'react-big-calendar' {
     max?: Date;
     messages?: Record<string, string>;
     eventPropGetter?: (event: Event) => any;
+    components?: any;
   }
 
   export const Calendar: ComponentType<CalendarProps>;

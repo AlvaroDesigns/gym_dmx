@@ -1,9 +1,12 @@
 'use client';
+
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { useClasses } from '@/hooks/useClasses';
 import { cn } from '@/lib/utils';
 
 import { dayjs } from '@/lib/dayjs';
+import { ClassEvent } from '@/types';
+import { toIsoDateString } from '@/utils/date';
 import 'dayjs/locale/es';
 import { Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -12,27 +15,6 @@ import { Card } from '../ui/card';
 import { Input } from '../ui/input';
 
 dayjs.locale('es');
-
-interface ClassEvent {
-  id: string;
-  date: string; // formato YYYY-MM-DD
-  label: string;
-  color?: string;
-  description?: string;
-  room?: string;
-  startTime?: string;
-  endTime?: string;
-  participants?: number;
-  maxCapacity?: number;
-  monitor?: string;
-  participantsList?: Array<{
-    id: string;
-    name: string | null;
-    surname: string | null;
-    instagram?: string | null;
-    tiktok?: string | null;
-  }>;
-}
 
 interface DateStripProps {
   classesPerDay?: ClassEvent[];
@@ -61,46 +43,33 @@ export default function DateStripTabs({
 
   const goToPrevWeek = () => {
     const prevWeek = currentWeekStart.subtract(1, 'week');
-    if (prevWeek.isBefore(dayjs(minDate).startOf('week'))) return;
+    // Permitir navegar a semanas anteriores tomando en cuenta minDate, o sin límite si no se pasa
+    if (minDate && prevWeek.isBefore(dayjs(minDate).startOf('week'))) {
+      setCurrentWeekStart(dayjs(minDate).startOf('week'));
+      return;
+    }
     setCurrentWeekStart(prevWeek);
   };
 
   const goToNextWeek = () => {
     const nextWeek = currentWeekStart.add(1, 'week');
-    if (nextWeek.isAfter(dayjs(maxDate).startOf('week'))) return;
+    if (maxDate && nextWeek.isAfter(dayjs(maxDate).startOf('week'))) {
+      setCurrentWeekStart(dayjs(maxDate).startOf('week'));
+      return;
+    }
     setCurrentWeekStart(nextWeek);
   };
 
   // Cargar eventos desde la API
   useEffect(() => {
-    const startDate = currentWeekStart.format('YYYY-MM-DD');
-    const endDate = currentWeekStart.add(6, 'day').format('YYYY-MM-DD');
+    const startDate = toIsoDateString(currentWeekStart.toDate());
+    const endDate = toIsoDateString(currentWeekStart.add(6, 'day').toDate());
     loadEvents(startDate, endDate);
   }, [currentWeekStart, loadEvents]);
 
-  type HookEvent = {
-    id: string;
-    title: string;
-    start: Date;
-    end: Date;
-    color?: string;
-    description?: string;
-    room?: string;
-    participants?: number;
-    maxCapacity?: number;
-    monitor?: string;
-    participantsList?: Array<{
-      id: string;
-      name: string | null;
-      surname: string | null;
-      instagram?: string | null;
-      tiktok?: string | null;
-    }>;
-  };
-
-  const mappedEvents: ClassEvent[] = events.map((e: HookEvent) => ({
+  const mappedEvents: ClassEvent[] = events.map((e) => ({
     id: e.id,
-    date: dayjs(e.start).format('YYYY-MM-DD'),
+    date: toIsoDateString(e.start),
     label: e.title,
     color: e.color,
     description: e.description,
@@ -111,12 +80,11 @@ export default function DateStripTabs({
     maxCapacity: e.maxCapacity,
     monitor: e.monitor,
     participantsList: e.participantsList || [],
-    // monitor lo propagamos dentro de data al abrir la ficha
   }));
 
   const selectedDayClasses = classesPerDay
     .concat(mappedEvents)
-    .filter((c) => c.date === selectedDate.format('YYYY-MM-DD'));
+    .filter((c) => c.date === toIsoDateString(selectedDate.toDate()));
 
   const filteredClasses = selectedDayClasses.filter((c) => {
     if (!filter) return true;
@@ -131,7 +99,7 @@ export default function DateStripTabs({
     selectedDayClasses.length === 0
       ? 'No hay clases este día'
       : 'No hay clases que coincidan con el filtro';
-  console.log('filteredClasses', filteredClasses);
+
   return (
     <div className="w-full max-w-lg mx-auto">
       {/* Header con navegación */}
