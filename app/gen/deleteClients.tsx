@@ -1,4 +1,5 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import { axiosInstance } from '@/lib/client';
+import type { AxiosRequestConfig } from 'axios';
 
 function deleteUsersUrl(): string {
   const baseUrl = '/api/users';
@@ -13,7 +14,7 @@ export async function deleteUsers(
 ): Promise<{ message: string }> {
   const url = deleteUsersUrl();
 
-  const response = await axios.delete<{ message: string }>(url, {
+  const response = await axiosInstance.delete<{ message: string }>(url, {
     ...config,
     data,
   });

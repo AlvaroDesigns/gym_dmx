@@ -1,9 +1,22 @@
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
+import { getToken } from 'next-auth/jwt';
+import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET - Obtener todas las clases
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const classes = await prisma.class.findMany({
       include: {
         schedules: true,
@@ -21,6 +34,16 @@ export async function GET() {
 // POST - Crear una nueva clase
 export async function POST(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const body = await request.json();
     const { name, description, maxCapacity, room, schedules } = body;
 
@@ -41,14 +64,23 @@ export async function POST(request: NextRequest) {
         room,
         schedules: {
           create:
-            schedules?.map((schedule: any) => ({
-              weekday: schedule.weekday,
-              monitor: schedule.monitor,
-              difficulty: schedule.difficulty,
-              capacity: schedule.capacity,
-              startTime: new Date(`2000-01-01T${schedule.startTime}`),
-              endTime: new Date(`2000-01-01T${schedule.endTime}`),
-            })) || [],
+            schedules?.map(
+              (schedule: {
+                weekday: string;
+                monitor: string;
+                difficulty: string;
+                capacity: number;
+                startTime: string;
+                endTime: string;
+              }) => ({
+                weekday: schedule.weekday,
+                monitor: schedule.monitor,
+                difficulty: schedule.difficulty,
+                capacity: schedule.capacity,
+                startTime: new Date(`2000-01-01T${schedule.startTime}`),
+                endTime: new Date(`2000-01-01T${schedule.endTime}`),
+              }),
+            ) || [],
         },
       },
       include: {

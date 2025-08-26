@@ -1,6 +1,7 @@
+import { axiosInstance } from '@/lib/client';
 import { RolesType } from '@/types';
 import { UserData } from '@/types/user';
-import axios, { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 interface GetUsersParams {
   roles?: RolesType;
@@ -33,7 +34,7 @@ export async function getUsers(
 ): Promise<UserData[]> {
   const url = getUsersUrl(params);
 
-  const response = await axios.get<UserData[]>(url, config);
+  const response = await axiosInstance.get<UserData[]>(url, config);
 
   return response.data;
 }

@@ -1,4 +1,5 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import { axiosInstance } from '@/lib/client';
+import type { AxiosRequestConfig } from 'axios';
 
 export type DeleteBookingPayload = {
   classId: string;
@@ -19,7 +20,7 @@ export async function deleteBooking(
 ): Promise<{ message: string }> {
   const url = bookingsUrl();
 
-  const response = await axios.delete<{ message: string }>(url, {
+  const response = await axiosInstance.delete<{ message: string }>(url, {
     ...config,
     data,
   });

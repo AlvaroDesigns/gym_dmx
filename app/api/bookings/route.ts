@@ -40,7 +40,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'classId es requerido' }, { status: 400 });
     }
 
-    const occurrenceDate = parseOccurrenceDate(body);
+    // Permitir classId con sufijo "__ISO" (id__2025-08-27T12:30:00.000Z)
+    const [pureClassId, isoSuffix] = (classId ?? '').split('__');
+    const effectiveClassId = pureClassId || classId;
+
+    let occurrenceDate = parseOccurrenceDate(body);
+    if (!occurrenceDate && isoSuffix) {
+      const parsed = new Date(isoSuffix);
+      if (!isNaN(parsed.getTime())) occurrenceDate = parsed;
+    }
     if (!occurrenceDate) {
       return NextResponse.json(
         { error: 'Fecha y hora inválidas. Use dateTime o date + startTime' },
@@ -48,7 +56,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const classRecord = await prisma.class.findUnique({ where: { id: classId } });
+    const classRecord = await prisma.class.findUnique({
+      where: { id: effectiveClassId },
+    });
     if (!classRecord) {
       return NextResponse.json({ error: 'Clase no encontrada' }, { status: 404 });
     }
@@ -57,7 +67,7 @@ export async function POST(request: NextRequest) {
     const existing = await prisma.userClass.findFirst({
       where: {
         userId,
-        classId,
+        classId: effectiveClassId,
         date: occurrenceDate,
       },
     });
@@ -70,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // Validar aforo (se usa maxCapacity de la clase)
     const currentCount = await prisma.userClass.count({
-      where: { classId, date: occurrenceDate },
+      where: { classId: effectiveClassId, date: occurrenceDate },
     });
     if (currentCount >= (classRecord.maxCapacity ?? 0)) {
       return NextResponse.json(
@@ -82,7 +92,7 @@ export async function POST(request: NextRequest) {
     const booking = await prisma.userClass.create({
       data: {
         userId,
-        classId,
+        classId: effectiveClassId,
         date: occurrenceDate,
       },
       include: {
@@ -95,11 +105,18 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error interno del servidor';
     // Conflicto por restricción única (fallback)
-    if (typeof error === 'object' && error && (error as any).code === 'P2002') {
-      return NextResponse.json(
-        { error: 'Ya estás inscrito en esta actividad' },
-        { status: 409 },
-      );
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in (error as Record<string, unknown>)
+    ) {
+      const code = (error as Record<string, unknown>).code;
+      if (typeof code === 'string' && code === 'P2002') {
+        return NextResponse.json(
+          { error: 'Ya estás inscrito en esta actividad' },
+          { status: 409 },
+        );
+      }
     }
     return NextResponse.json({ error: message }, { status: 500 });
   }
@@ -121,7 +138,15 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'classId es requerido' }, { status: 400 });
     }
 
-    const occurrenceDate = parseOccurrenceDate(body);
+    // Permitir classId con sufijo "__ISO" (id__2025-08-27T12:30:00.000Z)
+    const [pureClassId, isoSuffix] = (classId ?? '').split('__');
+    const effectiveClassId = pureClassId || classId;
+
+    let occurrenceDate = parseOccurrenceDate(body);
+    if (!occurrenceDate && isoSuffix) {
+      const parsed = new Date(isoSuffix);
+      if (!isNaN(parsed.getTime())) occurrenceDate = parsed;
+    }
     if (!occurrenceDate) {
       return NextResponse.json(
         { error: 'Fecha y hora inválidas. Use dateTime o date + startTime' },
@@ -130,7 +155,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const existing = await prisma.userClass.findFirst({
-      where: { userId, classId, date: occurrenceDate },
+      where: { userId, classId: effectiveClassId, date: occurrenceDate },
     });
 
     if (!existing) {

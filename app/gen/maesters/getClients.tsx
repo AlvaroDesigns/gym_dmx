@@ -1,4 +1,5 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import { axiosInstance } from '@/lib/client';
+import type { AxiosRequestConfig } from 'axios';
 
 export interface MaestresResponse {
   employees: Array<{ text: string; value: string }>;
@@ -24,7 +25,7 @@ export async function getMaestres(
 ): Promise<MaestresResponse> {
   const url = getMaestresUrl();
 
-  const response = await axios.get<MaestresResponse>(url, config);
+  const response = await axiosInstance.get<MaestresResponse>(url, config);
 
   return response.data;
 }
@@ -38,7 +39,7 @@ export async function getMaestresZones(
 ): Promise<ZonesResponse> {
   const url = getMaestresUrlZones();
 
-  const response = await axios.get<ZonesResponse>(url, config);
+  const response = await axiosInstance.get<ZonesResponse>(url, config);
 
   return response.data;
 }

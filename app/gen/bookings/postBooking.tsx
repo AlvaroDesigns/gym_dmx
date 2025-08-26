@@ -1,4 +1,5 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import { axiosInstance } from '@/lib/client';
+import type { AxiosRequestConfig } from 'axios';
 
 export type PostBookingPayload = {
   classId: string;
@@ -26,6 +27,6 @@ export async function postBooking(
   config: AxiosRequestConfig = {},
 ): Promise<BookingResponse> {
   const url = postBookingUrl();
-  const response = await axios.post<BookingResponse>(url, data, config);
+  const response = await axiosInstance.post<BookingResponse>(url, data, config);
   return response.data;
 }

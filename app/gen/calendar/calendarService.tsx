@@ -1,5 +1,6 @@
+import { axiosInstance } from '@/lib/client';
 import { UserData } from '@/types/user';
-import axios, { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 function calendarUrl(): string {
   const baseUrl = '/api/events';
@@ -38,7 +39,7 @@ export async function getCalendar(
     params.endDate,
   )}`;
 
-  const response = await axios.get<CalendarEventDto[]>(url, config);
+  const response = await axiosInstance.get<CalendarEventDto[]>(url, config);
   return response.data;
 }
 
@@ -48,7 +49,7 @@ export async function deleteCalendar(
 ): Promise<{ message: string }> {
   const url = calendarUrl();
 
-  const response = await axios.delete<{ message: string }>(url, {
+  const response = await axiosInstance.delete<{ message: string }>(url, {
     ...config,
     data,
   });
@@ -74,7 +75,7 @@ export async function postCalendar(
 ): Promise<UserData[]> {
   const url = calendarUrl();
 
-  const response = await axios.post<UserData[]>(url, data, config);
+  const response = await axiosInstance.post<UserData[]>(url, data, config);
 
   return response.data;
 }

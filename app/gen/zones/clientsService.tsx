@@ -1,5 +1,6 @@
+import { axiosInstance } from '@/lib/client';
 import { UserData } from '@/types/user';
-import axios, { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 function zonesUrl(): string {
   const baseUrl = '/api/zones';
@@ -14,7 +15,7 @@ export async function deleteZones(
 ): Promise<{ message: string }> {
   const url = zonesUrl();
 
-  const response = await axios.delete<{ message: string }>(url, {
+  const response = await axiosInstance.delete<{ message: string }>(url, {
     ...config,
     data,
   });
@@ -25,7 +26,7 @@ export async function deleteZones(
 export async function getZones(config: AxiosRequestConfig = {}): Promise<UserData[]> {
   const url = zonesUrl();
 
-  const response = await axios.get<UserData[]>(url, config);
+  const response = await axiosInstance.get<UserData[]>(url, config);
 
   return response.data;
 }

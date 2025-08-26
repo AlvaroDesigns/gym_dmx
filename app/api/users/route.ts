@@ -1,6 +1,7 @@
 import { hash } from 'bcryptjs';
+import { getToken } from 'next-auth/jwt';
 import { getServerSession } from 'next-auth/next';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { authOptions } from '../auth/[...nextauth]/route';
 
 import { prisma } from '@/lib/prisma';
@@ -208,8 +209,19 @@ export async function PUT(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     // Obtener los parámetros de la URL
     const { searchParams } = new URL(request.url);
     const roles = searchParams.get('roles');

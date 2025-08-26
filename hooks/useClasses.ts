@@ -2,7 +2,7 @@ import { getCalendar, type CalendarEventDto } from '@/app/gen/calendar/calendarS
 import { useCallback, useState } from 'react';
 import type { Event as RBCEvent } from 'react-big-calendar';
 
-type ClassEvent = RBCEvent & {
+export type ClassEvent = RBCEvent & {
   id: string;
   title: string;
   start: Date;

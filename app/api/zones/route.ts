@@ -1,11 +1,24 @@
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { PrismaClient } from '@prisma/client';
-import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+import { getServerSession } from 'next-auth/next';
+import { NextRequest, NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
 // POST - Crear una nueva zona
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const body = await request.json();
     const { name, description, imageUrl } = body;
 
@@ -49,8 +62,18 @@ export async function POST(request: Request) {
 }
 
 // GET - Obtener todas las zonas o una zona específica
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const zone = await prisma.zone.findMany({
       include: {
         classes: true, // Incluir las clases asociadas
@@ -73,8 +96,18 @@ export async function GET() {
 }
 
 // PUT - Actualizar una zona existente
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const body = await request.json();
     const { id, name, description, imageUrl } = body;
 
@@ -130,8 +163,18 @@ export async function PUT(request: Request) {
 }
 
 // DELETE - Eliminar una zona
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const body = await request.json();
     const { id } = body;
 

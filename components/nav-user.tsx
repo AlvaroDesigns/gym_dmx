@@ -24,6 +24,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { signOut } from 'next-auth/react';
 
 interface User {
   user: {
@@ -94,7 +95,12 @@ export function NavUser({ user }: User) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                signOut({ callbackUrl: '/' });
+              }}
+            >
               <IconLogout />
               Log out
             </DropdownMenuItem>

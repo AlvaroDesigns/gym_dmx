@@ -1,5 +1,6 @@
+import { axiosInstance } from '@/lib/client';
 import { RolesType } from '@/types';
-import axios, { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 interface UserType {
   lastName: string;
@@ -21,7 +22,7 @@ function getPaymentsUrl() {
 export async function getPayments(config: AxiosRequestConfig = {}): Promise<UserType[]> {
   const url = getPaymentsUrl();
 
-  const response = await axios.get<UserType[]>(url, config);
+  const response = await axiosInstance.get<UserType[]>(url, config);
 
   return response.data;
 }

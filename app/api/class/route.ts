@@ -1,6 +1,9 @@
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import type { Difficulty, Weekday } from '@prisma/client';
-import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+import { getServerSession } from 'next-auth/next';
+import { NextRequest, NextResponse } from 'next/server';
 
 type ScheduleInput = {
   weekday: Weekday;
@@ -12,8 +15,18 @@ type ScheduleInput = {
 };
 
 // POST - Crear una nueva clase
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const body = await request.json();
     const { name, description, maxCapacity, room, schedules } = body;
     const rawZoneId = body.zoneId as string | null | undefined;
@@ -73,8 +86,18 @@ export async function POST(request: Request) {
 }
 
 // GET - Obtener clases (todas o filtradas por id/zoneId)
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     const zoneId = searchParams.get('zoneId');
@@ -116,8 +139,18 @@ export async function GET(request: Request) {
 }
 
 // PUT - Actualizar una clase existente
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const body = await request.json();
     const { id, name, description, maxCapacity, room } = body;
     const rawZoneId = body.zoneId as string | null | undefined;
@@ -169,8 +202,18 @@ export async function PUT(request: Request) {
 }
 
 // DELETE - Eliminar una clase
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
+    let isAuth = false;
+    const session = await getServerSession(authOptions);
+    if (session?.user) isAuth = true;
+    if (!isAuth) {
+      const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      if (token) isAuth = true;
+    }
+    if (!isAuth) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
     const body = await request.json();
     const { id } = body;
 

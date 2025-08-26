@@ -1,5 +1,6 @@
+import { axiosInstance } from '@/lib/client';
 import { UserData, UserUpdateData } from '@/types/user';
-import axios, { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 function putUsersUrl(): string {
   const baseUrl = '/api/users'; // Esto funciona si estás del lado cliente o usando un proxy
@@ -14,7 +15,7 @@ export async function putUsers(
 ): Promise<UserData[]> {
   const url = putUsersUrl();
 
-  const response = await axios.put<UserData[]>(url, data, config);
+  const response = await axiosInstance.put<UserData[]>(url, data, config);
 
   return response.data;
 }

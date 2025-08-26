@@ -1,5 +1,6 @@
+import { axiosInstance } from '@/lib/client';
 import { UserData } from '@/types/user';
-import axios, { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 function getMaestresUrl(): string {
   const baseUrl = '/api/maesters'; // Esto funciona si estás del lado cliente o usando un proxy
@@ -11,7 +12,7 @@ function getMaestresUrl(): string {
 export async function getMaestres(config: AxiosRequestConfig = {}): Promise<UserData[]> {
   const url = getMaestresUrl();
 
-  const response = await axios.get<UserData[]>(url, config);
+  const response = await axiosInstance.get<UserData[]>(url, config);
 
   return response.data;
 }

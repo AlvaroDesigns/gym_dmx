@@ -16,8 +16,10 @@ import { FieldValues, Path } from 'react-hook-form';
 import { LITERALS } from '@/data/literals';
 import { useDeleteBooking } from '@/hooks/class/use-delete-booking';
 import { usePostBooking } from '@/hooks/class/use-post-booking';
+import { useGetUsers } from '@/hooks/users/use-get-users';
 import type { ClassEvent } from '@/types';
 import { ClockIcon, MapPinIcon } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -86,6 +88,16 @@ export default function BookingSheetForm<T extends FieldValues>({
   const [internalOpen, setInternalOpen] = useState(false);
   const actualOpen = isControlled ? (open as boolean) : internalOpen;
 
+  // Obtener usuario actual para comprobar si ya está apuntado
+  const { data: session } = useSession();
+  const sessionEmail = (session?.user as { email?: string } | undefined)?.email;
+  const { data: users } = useGetUsers({ roles: [], email: sessionEmail });
+  const currentUser = users?.[0];
+
+  const isUserBooked = (data?.participantsList || []).some(
+    (p) => p.name === currentUser?.name && p.surname === currentUser?.surname,
+  );
+
   const { mutateAsync, isPending } = usePostBooking();
   const { mutateAsync: mutateAsyncDelete, isPending: isPendingDelete } =
     useDeleteBooking();
@@ -152,6 +164,8 @@ export default function BookingSheetForm<T extends FieldValues>({
     }
   };
 
+  console.log('isUserBooked', isUserBooked);
+
   return (
     <Sheet open={actualOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -162,9 +176,9 @@ export default function BookingSheetForm<T extends FieldValues>({
         </SheetHeader>
         <AspectRatio ratio={16 / 9} className="bg-muted">
           <Image
+            fill
             src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
             alt="Photo by Drew Beamer"
-            fill
             className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
           />
         </AspectRatio>
@@ -204,7 +218,7 @@ export default function BookingSheetForm<T extends FieldValues>({
           <Button
             className="h-12"
             type="submit"
-            disabled={isPending}
+            disabled={isPending || isUserBooked}
             onClick={handleBooking}
           >
             Reservar
@@ -213,7 +227,7 @@ export default function BookingSheetForm<T extends FieldValues>({
             <Button
               className="h-12"
               type="submit"
-              disabled={isPendingDelete}
+              disabled={!isUserBooked || isPendingDelete}
               onClick={handleCancelBooking}
               variant="outline"
             >
@@ -233,7 +247,7 @@ const ParticipantList = ({ participantsList }: Pick<ClassEvent, 'participantsLis
 
   return (
     <div className="px-4 pb-4">
-      <ul className="grid grid-cols-4 gap-3">
+      <ul className="grid grid-cols-5 gap-3">
         {list.map((p) => (
           <li key={p.id} className="flex items-center justify-center">
             <GenericDrawer

@@ -1,5 +1,5 @@
+import { axiosInstance } from '@/lib/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 
 // Types
 export interface Zone {
@@ -27,27 +27,27 @@ export interface UpdateZoneData {
 
 // API functions
 const createZone = async (data: CreateZoneData): Promise<Zone> => {
-  const response = await axios.post('/api/zones', data);
+  const response = await axiosInstance.post('/api/zones', data);
   return response.data.zone;
 };
 
 const getZones = async (): Promise<Zone[]> => {
-  const response = await axios.get('/api/zones');
+  const response = await axiosInstance.get('/api/zones');
   return response.data;
 };
 
 const getZone = async (id: string): Promise<Zone> => {
-  const response = await axios.get(`/api/zones?id=${id}`);
+  const response = await axiosInstance.get(`/api/zones?id=${id}`);
   return response.data;
 };
 
 const updateZone = async (data: UpdateZoneData): Promise<Zone> => {
-  const response = await axios.put('/api/zones', data);
+  const response = await axiosInstance.put('/api/zones', data);
   return response.data.zone;
 };
 
 const deleteZone = async (id: string): Promise<void> => {
-  await axios.delete('/api/zones', { data: { id } });
+  await axiosInstance.delete('/api/zones', { data: { id } });
 };
 
 // Hooks
