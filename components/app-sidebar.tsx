@@ -41,7 +41,7 @@ const data = {
   navMain: [
     {
       title: 'Dashboard',
-      url: '/dashboard',
+      url: ROUTES_URL.DASHBOARD,
       icon: IconDashboard,
     },
     {
@@ -51,7 +51,7 @@ const data = {
       items: [
         {
           title: 'Añadir Personal',
-          url: '/staff/create_staff',
+          url: ROUTES_URL.STAFF_CREATE,
         },
       ],
     },
@@ -62,7 +62,7 @@ const data = {
       items: [
         {
           title: 'Añadir Clientes',
-          url: '/customers/create_user',
+          url: ROUTES_URL.CUSTOMER_CREATE,
         },
       ],
     },

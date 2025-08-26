@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
 
   const tokenRolesUnknown = (token as { roles?: unknown })?.roles;
   const roles = Array.isArray(tokenRolesUnknown) ? (tokenRolesUnknown as string[]) : [];
-
+  console.log('--roles', roles);
   const isAdminOrEmployee = roles.includes('ADMIN') || roles.includes('EMPLOYEE');
   const isOnlyUser = roles.length === 1 && roles[0] === 'USER';
 
@@ -24,6 +24,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Caso: ADMIN o EMPLOYEE → acceso libre
+
   if (isAdminOrEmployee) {
     return NextResponse.next();
   }

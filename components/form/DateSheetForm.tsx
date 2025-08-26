@@ -85,7 +85,7 @@ export default function DateSheetForm<T extends FieldValues>({
       setInternalOpen(nextOpen);
     }
   };
-  console.log('datadatadatadatadata', data);
+
   return (
     <Sheet open={actualOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -95,9 +95,8 @@ export default function DateSheetForm<T extends FieldValues>({
           <SheetTitle>{label}</SheetTitle>
         </SheetHeader>
         <DateStrip
-          classesPerDay={data?.map((cls, index) => ({
+          classesPerDay={data?.map((cls) => ({
             ...cls,
-            id: `${cls.date}-${index}`,
             color: `border-l-${cls.color}`,
             date: dayjs(cls.date).format('YYYY-MM-DD'),
           }))}

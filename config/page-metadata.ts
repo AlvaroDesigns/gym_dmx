@@ -9,57 +9,57 @@ export const pageMetadata: Record<string, PageMetadata> = {
     title: 'Dashboard',
     description: 'Panel principal del gimnasio con estadísticas y resumen',
   },
-  dashboard: {
+  'admin/dashboard': {
     title: 'Dashboard',
     description: 'Panel principal del gimnasio con estadísticas y resumen',
   },
 
   // Gestión de clientes
-  customers: {
+  'admin/customers': {
     title: 'Clientes',
     description: 'Gestión y administración de clientes del gimnasio',
   },
-  'customers/create_user': {
+  'admin/customers/create_user': {
     title: 'Crear Cliente',
     description: 'Registrar un nuevo cliente en el sistema',
   },
-  'customers/edit': {
+  'admin/customers/edit': {
     title: 'Editar Cliente',
     description: 'Modificar información de un cliente existente',
   },
 
   // Gestión de personal
-  staff: {
+  'admin/staff': {
     title: 'Personal',
     description: 'Administración del personal y empleados del gimnasio',
   },
-  'staff/create_staff': {
+  'admin/staff/create_staff': {
     title: 'Crear Empleado',
     description: 'Registrar un nuevo empleado en el sistema',
   },
-  'staff/edit': {
+  'admin/staff/edit': {
     title: 'Editar Empleado',
     description: 'Modificar información de un empleado existente',
   },
 
   // Clases y horarios
-  activities: {
+  'admin/activities': {
     title: 'Actividades',
     description: 'Gestión de clases y actividades del gimnasio',
   },
-  timetable_sessions: {
+  'admin/timetable_sessions': {
     title: 'Horarios',
     description: 'Programación y horarios de clases y sesiones',
   },
 
   // Pagos y facturación
-  payment: {
+  'admin/payment': {
     title: 'Pagos',
     description: 'Gestión de pagos, facturación y transacciones',
   },
 
   // Zonas del gimnasio
-  zones: {
+  'admin/zones': {
     title: 'Zonas',
     description: 'Administración de áreas y zonas del gimnasio',
   },

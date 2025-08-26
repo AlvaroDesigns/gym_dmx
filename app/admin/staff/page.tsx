@@ -6,12 +6,14 @@ import { ProductLayout } from '@/components/layout/product';
 import SkeletonUsers from '@/components/skeletons/skeleton-user';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ROUTES_URL } from '@/config/url';
 import { useViewToggle } from '@/hooks/use-view-toggle';
 import { useGetUsers } from '@/hooks/users/use-get-users';
+import { ROLES_EMPLOYEE } from '@/types';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { columns, type Customer } from './columns';
+import { columns } from './columns';
 
 export default function Page() {
   const router = useRouter();
@@ -21,25 +23,25 @@ export default function Page() {
     ['default', 'compiled'],
   );
 
-  const { data, isLoading } = useGetUsers({ roles: ['USER'] });
+  const { data, isLoading } = useGetUsers({ roles: ROLES_EMPLOYEE });
 
-  const filteredStaff = data?.filter((customer) => {
-    const fullName = `${customer.name} ${customer.surname}`.toLowerCase();
+  const filteredStaff = data?.filter((staff) => {
+    const fullName = `${staff.name} ${staff.surname}`.toLowerCase();
     return fullName.includes(filter.toLowerCase());
   });
 
   // Transform data to match Customer interface
-  const transformedData: Customer[] =
+  const transformedData: any[] =
     filteredStaff?.map((customer) => ({
-      id: customer.dni, // Use DNI as ID since UserData doesn't have id
+      id: customer.dni,
       name: customer.name,
       surname: customer.surname,
       lastName: customer.lastName,
       email: customer.email,
       dni: customer.dni,
       phone: customer.phone,
-      roles: customer.roles?.map((role) => role.toString()) || [], // Convert Role enum to string array
-      createdAt: new Date().toISOString(), // Use current date since UserData doesn't have createdAt
+      roles: customer.roles?.map((role) => role.toString()) || [],
+      createdAt: new Date().toISOString(),
     })) || [];
 
   const handleProductLayoutViewChange = (value: 'default' | 'compiled') => {
@@ -52,9 +54,9 @@ export default function Page() {
       onChangeView={handleProductLayoutViewChange}
       view={currentView}
       buttonProps={{
-        text: 'Añadir Cliente',
+        text: 'Añadir personal',
         routingUri: 'internal',
-        url: '/customers/create_user',
+        url: ROUTES_URL.STAFF_CREATE,
       }}
     >
       {isLoading ? (
@@ -65,14 +67,14 @@ export default function Page() {
             <div className="relative max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
               <Input
-                placeholder="Buscar cliente por nombre..."
+                placeholder="Buscar empleado por nombre..."
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
                 className="bg-background pl-10"
               />
             </div>
             <div className="text-sm text-muted-foreground">
-              {filteredStaff?.length || 0} cliente(s) encontrado(s)
+              {filteredStaff?.length || 0} empleado(s) encontrado(s)
             </div>
           </div>
 
@@ -93,15 +95,12 @@ export default function Page() {
                 }
               />
             ) : (
-              filteredStaff?.map((customer, index) => (
+              filteredStaff?.map((staff, index) => (
                 <TestimonialCard
-                  key={index}
-                  {...customer}
-                  name={`${customer.name} ${customer?.surname} ${customer.lastName || ''}`}
-                  staff={customer.dni}
-                  email={customer.email}
-                  onClick={() => router.push(`/customers/${customer?.dni}/edit`)}
                   editable
+                  key={index}
+                  {...staff}
+                  onClick={() => router.push(`${ROUTES_URL.STAFF}/${staff.dni}/edit`)}
                 />
               ))
             )}

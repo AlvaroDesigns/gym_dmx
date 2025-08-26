@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { signIn } from 'next-auth/react';
+import { getSession, signIn } from 'next-auth/react';
 
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { AlertCircleIcon } from 'lucide-react';
 
+import { ROUTES_URL } from '@/config/url';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -47,8 +48,15 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     if (res?.ok) {
       setMessageError(false);
 
-      // cookieStore.set('role', user.roles[0]);
-      router.push('/dashboard');
+      const session = await getSession();
+      const roles = (session?.user as { roles?: string[] } | undefined)?.roles ?? [];
+      const isAdminOrEmployee = roles.includes('ADMIN') || roles.includes('EMPLOYEE');
+
+      if (isAdminOrEmployee) {
+        router.push(ROUTES_URL.DASHBOARD);
+      } else {
+        router.push(ROUTES_URL.USER);
+      }
     } else {
       setMessageError(true);
       toast.error('Usuario o contraseña incorrectos');

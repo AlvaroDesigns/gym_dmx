@@ -67,24 +67,28 @@ export default function DateStripTabs({
     loadEvents(startDate, endDate);
   }, [currentWeekStart, loadEvents]);
 
-  const mappedEvents: ClassEvent[] = events.map((e) => ({
-    id: e.id,
+  const mappedEvents: Partial<ClassEvent>[] = events.map((e) => ({
+    ...e,
     date: toIsoDateString(e.start),
-    label: e.title,
-    color: e.color,
-    description: e.description,
-    room: e.room,
     startTime: dayjs(e.start).format('HH:mm'),
     endTime: dayjs(e.end).format('HH:mm'),
-    participants: e.participants,
-    maxCapacity: e.maxCapacity,
-    monitor: e.monitor,
+
     participantsList: e.participantsList || [],
   }));
 
-  const selectedDayClasses = classesPerDay
-    .concat(mappedEvents)
-    .filter((c) => c.date === toIsoDateString(selectedDate.toDate()));
+  const allClassesNoDup = (() => {
+    const unique = new Map<string, ClassEvent>();
+    const combined = classesPerDay.concat(mappedEvents);
+    for (const c of combined) {
+      const key = c.id || `${c.date}-${c.startTime}-${c.endTime}-${c.label}`;
+      if (!unique.has(key)) unique.set(key, c);
+    }
+    return Array.from(unique.values());
+  })();
+
+  const selectedDayClasses = allClassesNoDup.filter(
+    (c) => c.date === toIsoDateString(selectedDate.toDate()),
+  );
 
   const filteredClasses = selectedDayClasses.filter((c) => {
     if (!filter) return true;
@@ -124,9 +128,9 @@ export default function DateStripTabs({
                   darkMode ? 'bg-[#0f1623] text-white' : 'bg-white text-black shadow-md',
                 )}
               >
-                {weekDays.map((date, dayIndex) => {
-                  const isSelected = selectedDate.isSame(date, 'day');
-                  const isWeekend = date.day() === 0 || date.day() === 6;
+                {weekDays?.map((date, dayIndex) => {
+                  const isSelected = selectedDate?.isSame(date, 'day');
+                  const isWeekend = date?.day() === 0 || date.day() === 6;
 
                   return (
                     <button
@@ -147,9 +151,9 @@ export default function DateStripTabs({
                           isWeekend && 'text-red-500',
                         )}
                       >
-                        {date.format('ddd').toUpperCase()}
+                        {date?.format('ddd').toUpperCase()}
                       </span>
-                      <span className="text-sm">{date.format('DD')}</span>
+                      <span className="text-sm">{date?.format('DD')}</span>
                     </button>
                   );
                 })}
@@ -181,6 +185,9 @@ export default function DateStripTabs({
         {filteredClasses.length > 0 ? (
           filteredClasses.map((cls, i) => (
             <BookingSheetForm
+              {...cls}
+              classId={cls.id}
+              fullWidth
               data={cls}
               label={cls.label}
               key={`${cls.date}-${i}`}
@@ -216,7 +223,6 @@ export default function DateStripTabs({
                     </div>
                   )}
                 </div>
-                {cls.description && <p className="mt-1">{cls.description}</p>}
                 {cls.participants && cls.maxCapacity && (
                   <div className="mt-2 flex justify-end gap-2 text-s text-muted-foreground">
                     <div className="bg-blue-500 text-white dark:bg-blue-600 px-2 py-0.5 rounded-md">

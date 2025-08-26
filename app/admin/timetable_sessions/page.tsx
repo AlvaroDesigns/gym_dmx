@@ -11,7 +11,7 @@ import { usePostEvents } from '@/hooks/events/use-post-events';
 import { useGetMaestres } from '@/hooks/use-get-maesters';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -35,16 +35,24 @@ export default function Page() {
   const createCalendarMutation = usePostEvents();
   const fields = getFieldsModalCalendar(data);
 
-  const { startDate, endDate } = useMemo(() => {
+  const [dateRange, setDateRange] = useState(() => {
     const start = dayjs().startOf('week');
     const end = start.add(RANGE_DAYS_FOR_CALENDAR, 'day');
+
     return {
       startDate: start.format('YYYY-MM-DD'),
       endDate: end.format('YYYY-MM-DD'),
     };
-  }, []);
+  });
 
-  const { data: events, isLoading, error } = useGetEvents({ startDate, endDate });
+  const { data: events, isLoading } = useGetEvents({
+    startDate: dateRange.startDate,
+    endDate: dateRange.endDate,
+  });
+
+  const handleWeekChange = (start: string, end: string) => {
+    setDateRange({ startDate: start, endDate: end });
+  };
 
   const formClass = useForm<ClassFormValues>({
     defaultValues: {
@@ -103,7 +111,7 @@ export default function Page() {
         />
       }
     >
-      <GymCalendar data={events ?? []} />
+      <GymCalendar data={events ?? []} onWeekChange={handleWeekChange} />
     </ProductLayout>
   );
 }

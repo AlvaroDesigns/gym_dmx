@@ -13,10 +13,15 @@ import Image from 'next/image';
 
 import { FieldValues, Path } from 'react-hook-form';
 
+import { LITERALS } from '@/data/literals';
+import { useDeleteBooking } from '@/hooks/class/use-delete-booking';
+import { usePostBooking } from '@/hooks/class/use-post-booking';
 import type { ClassEvent } from '@/types';
 import { ClockIcon, MapPinIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { GenericDrawer } from '../generic-drawer';
 import { AspectRatio } from '../ui/aspect-ratio';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Separator } from '../ui/separator';
@@ -60,17 +65,20 @@ export interface EditSheetFormProps<T extends FieldValues = FieldValues> {
   onSubmit?: (data: T) => void;
   fields?: FieldConfig<T>[]; // opcional y no usado por ahora
   label?: string; // opcional
+  classId: string; // id de la clase para reservar
   data?: Pick<
     ClassEvent,
-    'room' | 'startTime' | 'endTime' | 'monitor' | 'participantsList'
+    'room' | 'date' | 'startTime' | 'endTime' | 'monitor' | 'participantsList'
   >;
 }
 
 export default function BookingSheetForm<T extends FieldValues>({
+  fullWidth = false,
   children,
   open,
   setOpen,
   label,
+  classId,
   data,
 }: EditSheetFormProps<T>) {
   // Modo controlado si se pasan open y setOpen; si no, modo no controlado con estado interno
@@ -78,7 +86,63 @@ export default function BookingSheetForm<T extends FieldValues>({
   const [internalOpen, setInternalOpen] = useState(false);
   const actualOpen = isControlled ? (open as boolean) : internalOpen;
 
-  const { room, endTime, startTime, monitor, participantsList } = data || {};
+  const { mutateAsync, isPending } = usePostBooking();
+  const { mutateAsync: mutateAsyncDelete, isPending: isPendingDelete } =
+    useDeleteBooking();
+
+  const handleBooking = async () => {
+    const bookingDate = data?.date;
+    const bookingStartTime = data?.startTime;
+
+    if (!bookingDate || !bookingStartTime) {
+      toast.error(LITERALS.MESSAGES.ERROR);
+      return;
+    }
+
+    await mutateAsync(
+      {
+        classId,
+        date: bookingDate,
+        startTime: bookingStartTime,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`${LITERALS.BOOKING} ${LITERALS.MESSAGES.CREATE}`);
+        },
+        onError: () => {
+          toast.error(LITERALS.MESSAGES.ERROR);
+        },
+      },
+    );
+  };
+
+  const handleCancelBooking = async () => {
+    const bookingDate = data?.date;
+    const bookingStartTime = data?.startTime;
+
+    if (!bookingDate || !bookingStartTime) {
+      toast.error(LITERALS.MESSAGES.ERROR);
+      return;
+    }
+
+    await mutateAsyncDelete(
+      {
+        classId,
+        date: bookingDate,
+        startTime: bookingStartTime,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`${LITERALS.BOOKING} ${LITERALS.MESSAGES.CANCEL}`);
+        },
+        onError: () => {
+          toast.error(LITERALS.MESSAGES.ERROR);
+        },
+      },
+    );
+  };
+
+  const { room, endTime, startTime, monitor } = data || {};
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (isControlled) {
@@ -92,7 +156,7 @@ export default function BookingSheetForm<T extends FieldValues>({
     <Sheet open={actualOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>{children}</SheetTrigger>
 
-      <SheetContent>
+      <SheetContent className={fullWidth ? 'w-full max-w-lg' : ''}>
         <SheetHeader>
           <SheetTitle>{label}</SheetTitle>
         </SheetHeader>
@@ -133,16 +197,26 @@ export default function BookingSheetForm<T extends FieldValues>({
             </div>
           </div>
           <Separator className="my-4" />
-
           <ParticipantList participantsList={data?.participantsList} />
         </div>
 
         <SheetFooter>
-          <Button className="h-12" type="submit">
+          <Button
+            className="h-12"
+            type="submit"
+            disabled={isPending}
+            onClick={handleBooking}
+          >
             Reservar
           </Button>
           <SheetClose asChild>
-            <Button className="h-12" variant="outline" disabled>
+            <Button
+              className="h-12"
+              type="submit"
+              disabled={isPendingDelete}
+              onClick={handleCancelBooking}
+              variant="outline"
+            >
               Cancelar
             </Button>
           </SheetClose>
@@ -162,15 +236,28 @@ const ParticipantList = ({ participantsList }: Pick<ClassEvent, 'participantsLis
       <ul className="grid grid-cols-4 gap-3">
         {list.map((p) => (
           <li key={p.id} className="flex items-center justify-center">
-            <Avatar
-              className="h-12 w-12"
-              title={[p.name, p.surname].filter(Boolean).join(' ') || 'Sin nombre'}
+            <GenericDrawer
+              trigger={
+                <Avatar
+                  className="h-12 w-12"
+                  title={[p.name, p.surname].filter(Boolean).join(' ') || 'Sin nombre'}
+                >
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>
+                    {(p.name || p.surname || '?').toString().charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+              }
+              direction="bottom"
+              modal
+              contentClassName="p-4"
+              contentProps={{ forceMount: true }}
             >
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>
-                {(p.name || p.surname || '?').toString().charAt(0)}
-              </AvatarFallback>
-            </Avatar>
+              <div className="p-4">
+                <h2 className="text-lg font-semibold">Perfil publico</h2>
+                {/* Tu contenido aquí */}
+              </div>
+            </GenericDrawer>
           </li>
         ))}
       </ul>

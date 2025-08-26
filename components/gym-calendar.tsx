@@ -13,7 +13,13 @@ import { toast } from 'sonner';
 
 import type { CalendarEventDto } from '@/app/gen/calendar/calendarService';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { TAILWIND_HEX_COLORS } from '@/config/colors';
 import { useClasses } from '@/hooks/useClasses';
 import { Card } from './ui/card';
@@ -30,16 +36,21 @@ const localizer = dateFnsLocalizer({
 
 interface GymCalendarProps {
   data?: CalendarEventDto[];
+  onWeekChange?: (startDate: string, endDate: string) => void;
 }
 
 type RBCEvent = Event & {
   monitor?: string;
-  resource?: any;
+  resource?: {
+    room?: string;
+    participants?: number;
+    maxCapacity?: number;
+  };
   color?: string;
   description?: string;
 };
 
-export default function GymCalendar({ data }: GymCalendarProps) {
+export default function GymCalendar({ data, onWeekChange }: GymCalendarProps) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -187,11 +198,13 @@ export default function GymCalendar({ data }: GymCalendarProps) {
   useEffect(() => {
     if (propEvents && propEvents.length > 0) {
       const first = propEvents[0];
-      const base = dayjs(first.start as Date);
-      setSelectedDate(base);
-      setCurrentWeekStart(base.startOf('week'));
+      const base = dayjs(first.start as Date).startOf('week');
+      if (!base.isSame(currentWeekStart, 'day')) {
+        setSelectedDate(base);
+        setCurrentWeekStart(base);
+      }
     }
-  }, [propEvents]);
+  }, [propEvents, currentWeekStart]);
 
   return (
     <div className="h-full space-y-4">
@@ -204,9 +217,16 @@ export default function GymCalendar({ data }: GymCalendarProps) {
           views={['week', 'day']}
           date={selectedDate.toDate()}
           onNavigate={(newDate: Date) => {
-            const base = dayjs(newDate);
-            setSelectedDate(base);
-            setCurrentWeekStart(base.startOf('week'));
+            const baseWeek = dayjs(newDate).startOf('week');
+            if (baseWeek.isSame(currentWeekStart, 'day')) {
+              setSelectedDate(baseWeek);
+              return;
+            }
+            setSelectedDate(baseWeek);
+            setCurrentWeekStart(baseWeek);
+            const startDate = baseWeek.format('YYYY-MM-DD');
+            const endDate = baseWeek.add(6, 'day').format('YYYY-MM-DD');
+            onWeekChange?.(startDate, endDate);
           }}
           selectable
           onSelectSlot={handleSelectSlot}
@@ -232,7 +252,7 @@ export default function GymCalendar({ data }: GymCalendarProps) {
             event: ({ event }: { event: RBCEvent }) => {
               const monitor = event?.monitor ?? '';
               const time = `${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`;
-              console.log('events', event);
+
               return (
                 <div className="flex flex-col items-left justify-center mt-1">
                   <span className="text-[13px] font-normal opacity-80">{time}</span>
@@ -251,6 +271,7 @@ export default function GymCalendar({ data }: GymCalendarProps) {
               TAILWIND_HEX_COLORS[event.color as keyof typeof TAILWIND_HEX_COLORS] ??
               event.color ??
               '#3b82f6';
+
             return {
               style: {
                 backgroundColor,
@@ -270,6 +291,9 @@ export default function GymCalendar({ data }: GymCalendarProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Eliminar clase</DialogTitle>
+            <DialogDescription>
+              Confirma que deseas eliminar la actividad seleccionada.
+            </DialogDescription>
           </DialogHeader>
 
           <p>

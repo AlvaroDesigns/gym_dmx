@@ -8,14 +8,6 @@ import { Button } from '@/components/ui/button';
 import { FormItem } from '@/components/ui/form';
 import { useGetUsers } from '@/hooks/users/use-get-users';
 
-const USER = {
-  name: 'Álvaro Saiz Bonilla',
-  staff: 'Supervisor, Comunicación',
-  email: 'alvaro.saiz.bonilla@gmail.com',
-  dni: '12345678J',
-  image: 'https://github.com/shadcn.png',
-};
-
 export default function Page() {
   const { data } = useGetUsers({
     email: 'hello@alvarodesigns.com',

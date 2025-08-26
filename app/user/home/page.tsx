@@ -22,28 +22,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useClasses } from '@/hooks/useClasses';
 import { useGetUsers } from '@/hooks/users/use-get-users';
+import { dayjs } from '@/lib/dayjs';
 import { ClockIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-import { Fragment } from 'react';
+import { Fragment, useEffect, useMemo } from 'react';
 
-const CLASS = [
-  {
-    name: 'Yoga',
-    description: 'Relax and stretch with our Yoga class.',
-    time: 'Friday, 6:00 PM - 7:00 PM',
-  },
-  {
-    name: 'HIIT',
-    description: 'High-Intensity Interval Training for maximum results.',
-    time: 'Wednesday, 7:00 PM - 8:00 PM',
-  },
-  {
-    name: 'HIT',
-    description: 'High-Intensity Interval Training',
-    time: 'Wednesday, 7:00 PM - 14:00 PM',
-  },
-];
+// Se muestran las reservas del usuario para la semana actual
 
 export default function Page() {
   const { data } = useGetUsers({
@@ -51,6 +37,26 @@ export default function Page() {
   });
 
   const user = data?.[0];
+
+  const { events, loadEvents } = useClasses();
+
+  useEffect(() => {
+    const startDate = dayjs().startOf('week').format('YYYY-MM-DD');
+    const endDate = dayjs().startOf('week').add(6, 'day').format('YYYY-MM-DD');
+    loadEvents(startDate, endDate);
+  }, [loadEvents]);
+
+  // Filtra eventos donde el usuario actual está en la lista de participantes
+  const userEvents = useMemo(() => {
+    if (!user) return [] as typeof events;
+    return events
+      .filter((evt) =>
+        (evt.participantsList || []).some(
+          (p) => p.name === user?.name && p.surname === user?.surname,
+        ),
+      )
+      .sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0));
+  }, [events, user]);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -78,7 +84,7 @@ export default function Page() {
           </div>
         </div>
 
-        {/* Class */}
+        {/* Reservas del usuario */}
         <div className="flex flex-col">
           <div className="flex justify-between items-center px-6">
             <h2 className="text-xl font-bold">Agenda</h2>
@@ -87,7 +93,12 @@ export default function Page() {
             </DateSheetForm>
           </div>
           <div className="flex flex-row gap-4 p-6 pt-3 md:gap-6 md:py-6 overflow-auto">
-            {CLASS.map((cls, index) => (
+            {userEvents.length === 0 && (
+              <span className="text-sm text-muted-foreground">
+                No tienes reservas esta semana
+              </span>
+            )}
+            {userEvents.map((evt, index) => (
               <Fragment key={index}>
                 <Sheet>
                   <SheetTrigger asChild>
@@ -103,8 +114,11 @@ export default function Page() {
                         </AspectRatio>
                       </CardContent>
                       <CardHeader className="px-4 pt-0">
-                        <CardTitle>{cls.name}</CardTitle>
-                        <CardDescription>{cls.time}</CardDescription>
+                        <CardTitle>{evt.title}</CardTitle>
+                        <CardDescription>
+                          {dayjs(evt.start).format('dddd, HH:mm')} -{' '}
+                          {dayjs(evt.end).format('HH:mm')}
+                        </CardDescription>
                       </CardHeader>
                     </Card>
                   </SheetTrigger>
@@ -134,13 +148,14 @@ export default function Page() {
                             <div className="flex flex-row items-center gap-2">
                               <ClockIcon className="w-5 h-5 text-black" />
                               <span className="text-md leading-none text-muted-foreground">
-                                18:00 - 19:00
+                                {dayjs(evt.start).format('HH:mm')} -{' '}
+                                {dayjs(evt.end).format('HH:mm')}
                               </span>
                             </div>
                             <div className="flex flex-row items-center gap-2">
                               <MapPinIcon className="w-5 h-5 text-black" />
                               <span className="text-md leading-none text-muted-foreground">
-                                Sala 1
+                                {evt.room || 'Sala'}
                               </span>
                             </div>
                           </div>
