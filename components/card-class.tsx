@@ -148,7 +148,7 @@ export const IntegrationCard = ({
       toast.error(error instanceof Error ? error.message : 'Error al eliminar la zona');
     }
   };
-  console.log(TAILWIND_HEX_COLORS[color as keyof typeof TAILWIND_HEX_COLORS]);
+
   return (
     <Card
       style={{

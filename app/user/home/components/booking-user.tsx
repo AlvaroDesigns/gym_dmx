@@ -4,6 +4,7 @@ import BookingSheetForm from '@/components/form/BookingSheetForm';
 import DateSheetForm from '@/components/form/DateSheetForm';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -12,8 +13,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import type { ClassEvent } from '@/hooks/useClasses';
-import { dayjs } from '@/lib/dayjs';
-import { IconQuestionMark } from '@tabler/icons-react';
+import { toIsoDateString } from '@/utils/date';
+import { IconCalendarClock, IconQuestionMark } from '@tabler/icons-react';
 import Image from 'next/image';
 import { Fragment } from 'react';
 
@@ -27,7 +28,7 @@ export function BookingUser({ events }: { events: ClassEvent[] }) {
         </DateSheetForm>
       </div>
 
-      <div className="flex flex-row gap-4 p-6 pt-3 md:gap-6 md:py-6 overflow-auto">
+      <div className="flex flex-col gap-4 p-6 pt-3 md:gap-6 md:py-6">
         {events?.length === 0 && (
           <Alert>
             <IconQuestionMark className="w-6 h-6" />
@@ -47,32 +48,40 @@ export function BookingUser({ events }: { events: ClassEvent[] }) {
               label={evt.title}
               fullWidth
               data={{
-                room: evt.room,
-                date: dayjs(evt.start).format('YYYY-MM-DD'),
-                startTime: dayjs(evt.start).format('HH:mm'),
-                endTime: dayjs(evt.end).format('HH:mm'),
-                monitor: evt.monitor,
-                participantsList: evt.participantsList,
+                room: evt?.room,
+                date: toIsoDateString(evt?.start, 'YYYY-MM-DD'),
+                startTime: toIsoDateString(evt?.start, 'HH:mm'),
+                endTime: toIsoDateString(evt?.end, 'HH:mm'),
+                monitor: evt?.monitor,
+                participantsList: evt?.participantsList,
               }}
             >
-              <Card className="w-full max-w-sm py-4 gap-4 min-w-[45%] pt-0">
-                <CardContent className="px-4 p-0">
-                  <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg">
+              <Card className="w-full flex flex-row p-0 gap-4 pt-0 items-stretch">
+                <CardHeader className="!p-0 w-28 md:w-40 shrink-0 gap-0">
+                  <AspectRatio ratio={1} className="bg-muted rounded-sm overflow-hidden">
                     <Image
-                      src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
-                      alt="Photo by Drew Beamer"
                       fill
-                      className="h-full w-full rounded-lg object-cover dark:brightness-[0.2] dark:grayscale"
+                      alt="Photo by Drew Beamer"
+                      src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
+                      className="h-full w-full rounded-sm object-cover dark:brightness-[0.2] dark:grayscale"
                     />
                   </AspectRatio>
-                </CardContent>
-                <CardHeader className="px-4 pt-0">
-                  <CardTitle>{evt.title}</CardTitle>
-                  <CardDescription>
-                    {dayjs(evt.start).format('dddd, HH:mm')} -{' '}
-                    {dayjs(evt.end).format('HH:mm')}
-                  </CardDescription>
                 </CardHeader>
+                <CardContent className="px-4 p-0 gap-1 flex-1 flex flex-col justify-center">
+                  <CardTitle className="text-xl font-semibold">{evt?.title}</CardTitle>
+                  <CardDescription>
+                    <p className="flex flex-row text-md items-center justify-start -ml-1">
+                      <IconCalendarClock className="h-4 mr-1" />
+                      {toIsoDateString(evt?.start, 'DD/MM/YY · HH:mm')}
+                    </p>
+                    <div className="flex flex-row items-center justify-start gap-2">
+                      <Badge variant="success" className="h-4 px-2" />
+                      <p className="flex flex-row text-md items-center justify-start -ml-1 text-muted-foreground">
+                        Clase reservada
+                      </p>
+                    </div>
+                  </CardDescription>
+                </CardContent>
               </Card>
             </BookingSheetForm>
           </Fragment>

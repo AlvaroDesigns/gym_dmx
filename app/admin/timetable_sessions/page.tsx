@@ -88,6 +88,7 @@ export default function Page() {
   const onSubmitClass = (data: ClassFormValues) => {
     handleCreateClass(data);
     setOpenCalendarForm(false);
+
     formClass.reset();
   };
 

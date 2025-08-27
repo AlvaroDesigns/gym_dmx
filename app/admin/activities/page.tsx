@@ -30,6 +30,15 @@ export default function Page() {
     ['default', 'compiled'],
   );
 
+  const formClass = useForm<ClassData>({
+    defaultValues: {
+      name: '',
+      description: '',
+      maxCapacity: 0,
+      room: '',
+    },
+  });
+
   const handleProductLayoutViewChange = (value: 'default' | 'compiled') => {
     handleViewChange(value);
   };
@@ -49,15 +58,6 @@ export default function Page() {
       },
     );
   };
-
-  const formClass = useForm<ClassData>({
-    defaultValues: {
-      name: '',
-      description: '',
-      maxCapacity: 0,
-      room: '',
-    },
-  });
 
   const onSubmitClass = (data: ClassData) => {
     handleCreateClass(data);

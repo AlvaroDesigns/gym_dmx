@@ -4,6 +4,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 import { useClasses } from '@/hooks/useClasses';
 import { cn } from '@/lib/utils';
 
+import { TAILWIND_HEX_COLORS } from '@/config/colors';
 import { dayjs } from '@/lib/dayjs';
 import { ClassEvent } from '@/types';
 import { toIsoDateString } from '@/utils/date';
@@ -69,11 +70,10 @@ export default function DateStripTabs({
 
   const mappedEvents: Partial<ClassEvent>[] = events.map((e) => ({
     ...e,
-    date: toIsoDateString(e.start),
-    startTime: dayjs(e.start).format('HH:mm'),
-    endTime: dayjs(e.end).format('HH:mm'),
-
-    participantsList: e.participantsList || [],
+    date: toIsoDateString(e?.start, 'YYYY-MM-DD'),
+    startTime: toIsoDateString(e?.start, 'HH:mm'),
+    endTime: toIsoDateString(e?.end, 'HH:mm'),
+    participantsList: e?.participantsList || [],
   }));
 
   const allClassesNoDup = (() => {
@@ -189,19 +189,14 @@ export default function DateStripTabs({
               classId={cls.id}
               fullWidth
               data={cls}
-              label={cls.label}
               key={`${cls.date}-${i}`}
               open={openIndex === i}
               setOpen={(o: boolean) => setOpenIndex(o ? i : null)}
             >
               <Card
-                className={cn(
-                  'p-2 mb-4 rounded-lg text-sm flex justify-center',
-                  'px-6 py-2 min-h-16',
-                  `${cls.color}`,
-                )}
+                className="p-2 mb-4 rounded-lg text-sm flex justify-center px-4 py-2 min-h-14"
                 style={{
-                  borderLeftWidth: '8px',
+                  borderLeft: `8px solid ${TAILWIND_HEX_COLORS[cls?.color as keyof typeof TAILWIND_HEX_COLORS]}`,
                 }}
               >
                 <div className="flex flex-row gap-2 justify-between w-full items-start">

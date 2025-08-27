@@ -1,25 +1,33 @@
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
+interface AvatarSectionsProps extends AvatarComponentProps {
+  name: string;
+  status?: boolean;
+  isBanned?: boolean;
+  isAvatar?: boolean;
+}
 
 export const AvatarSections = ({
   name,
   status,
   isBanned = true,
-}: {
-  name: string;
-  status?: boolean;
-  isBanned?: boolean;
-}) => {
+  isAvatar = false,
+  size,
+  image,
+}: AvatarSectionsProps) => {
   const variantStatus = status ? 'success' : 'destructive';
   const variantLabel = status ? 'Cliente Activo' : 'Cliente Desactivado';
+
+  if (isAvatar) {
+    return <AvatarComponent size={size} name={name} image={image} />;
+  }
 
   return (
     <div className="flex flex-col gap-4 pmd:gap-6 md:py-2">
       <div className="flex gap-4 items-center">
-        <Avatar className="h-19 w-19">
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
-        </Avatar>
+        <AvatarComponent size={size} name={name} image={image} />
         <div className="flex flex-col gap-2">
           <span className="text-[20px] leading-none font-semibold">¡Hola {name}!</span>
           {isBanned && (
@@ -30,5 +38,30 @@ export const AvatarSections = ({
         </div>
       </div>
     </div>
+  );
+};
+
+interface AvatarComponentProps {
+  size?: 'sm' | 'md' | 'lg';
+  image?: string;
+  name: string;
+}
+
+const AvatarComponent = ({
+  size = 'md',
+  image = 'https://github.com/shadcn.png',
+  name,
+}: AvatarComponentProps) => {
+  return (
+    <Avatar
+      className={cn(
+        size === 'md' && 'h-19 w-19',
+        size === 'sm' && 'h-14 w-14',
+        size === 'lg' && 'h-24 w-24',
+      )}
+    >
+      <AvatarImage src={image} />
+      <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
+    </Avatar>
   );
 };

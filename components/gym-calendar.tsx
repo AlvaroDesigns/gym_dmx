@@ -20,8 +20,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+// Removed inline inputs in favor of EditSheetForm
 import { TAILWIND_HEX_COLORS } from '@/config/colors';
+import { useCreateClass } from '@/hooks/class/use-post-class';
 import { useClasses } from '@/hooks/useClasses';
+import { ClassData } from '@/types';
+import { toIsoDateString } from '@/utils/date';
+import { useForm } from 'react-hook-form';
 import { Card } from './ui/card';
 
 const locales = { es };
@@ -53,25 +58,22 @@ type RBCEvent = Event & {
 export default function GymCalendar({ data, onWeekChange }: GymCalendarProps) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [autoOpenDialog, setAutoOpenDialog] = useState(false);
+  const [openClassForm, setOpenClassForm] = useState(false);
 
   const today = dayjs();
   const [selectedDate, setSelectedDate] = useState(today);
   const [currentWeekStart, setCurrentWeekStart] = useState(today.startOf('week'));
-  const { isLoading, loadEvents, refreshEvents, events } = useClasses();
-  const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(
-    null,
-  );
-  const [formData, setFormData] = useState({
-    title: '',
-    instructor: '',
-    room: '',
-    color: '#3b82f6',
-    maxCapacity: 20,
-    description: '',
+  const { loadEvents, refreshEvents, events } = useClasses();
+  const createClassMutation = useCreateClass();
+
+  const formClass = useForm<ClassData>({
+    defaultValues: {
+      name: '',
+      description: '',
+      maxCapacity: 0,
+      room: '',
+    },
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formats = {
     dayRangeHeaderFormat: ({ start, end }: { start: Date; end: Date }) => {
@@ -84,71 +86,26 @@ export default function GymCalendar({ data, onWeekChange }: GymCalendarProps) {
     eventTimeRangeFormat: () => '',
   };
 
-  const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
-    setSelectedSlot({ start, end });
-    setAutoOpenDialog(true); // Abrir automáticamente el dialog
-    setShowAddForm(true);
+  const handleCreateClass = (data: ClassData) => {
+    createClassMutation.mutate(
+      {
+        ...data,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Clase creada correctamente');
+        },
+        onError: () => {
+          toast.error('Ha ocurrido un error');
+        },
+      },
+    );
   };
 
-  // Efecto para abrir automáticamente el dialog cuando se selecciona un slot
-  useEffect(() => {
-    if (autoOpenDialog && selectedSlot) {
-      setShowAddForm(true);
-      setAutoOpenDialog(false);
-    }
-  }, [autoOpenDialog, selectedSlot]);
-
-  const handleAddEvent = async () => {
-    alert('add event');
-    if (!formData.title || !selectedSlot) return;
-
-    setIsSubmitting(true);
-    try {
-      // Crear la clase en la API
-      const response = await fetch('/api/events', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          className: formData.title,
-          description: formData.description,
-          date: selectedSlot.start.toISOString().split('T')[0],
-          startTime: selectedSlot.start.toTimeString().slice(0, 5),
-          endTime: selectedSlot.end.toTimeString().slice(0, 5),
-          room: formData.room,
-          maxCapacity: formData.maxCapacity,
-          monitor: formData.instructor,
-          difficulty: 'MEDIUM',
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error al crear la clase');
-      }
-
-      // Se recargarán eventos reales desde la API
-      const startDate = currentWeekStart.format('YYYY-MM-DD');
-      const endDate = currentWeekStart.add(6, 'day').format('YYYY-MM-DD');
-      await refreshEvents(startDate, endDate);
-      setSelectedSlot(null);
-      setFormData({
-        title: '',
-        instructor: '',
-        room: '',
-        color: '#3b82f6',
-        maxCapacity: 20,
-        description: '',
-      });
-
-      toast.success('Clase creada exitosamente');
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al crear la clase');
-    } finally {
-      setIsSubmitting(false);
-    }
+  const onSubmitClass = (data: ClassData) => {
+    handleCreateClass(data);
+    setOpenClassForm(false);
+    formClass.reset();
   };
 
   const handleSelectEvent = (event: Event) => {
@@ -164,6 +121,21 @@ export default function GymCalendar({ data, onWeekChange }: GymCalendarProps) {
     const startDate = currentWeekStart.format('YYYY-MM-DD');
     const endDate = currentWeekStart.add(6, 'day').format('YYYY-MM-DD');
     refreshEvents(startDate, endDate);
+  };
+
+  const handleEditEvent = () => {
+    if (!selectedEvent) return;
+    const e = selectedEvent as RBCEvent;
+
+    formClass.reset({
+      name: (e?.title as string) || '',
+      description: e?.description || '',
+      room: e?.resource?.room || '',
+      maxCapacity: e?.resource?.maxCapacity || 0,
+    });
+
+    setShowDeleteModal(false);
+    setOpenClassForm(true);
   };
 
   // Mapear eventos proporcionados por props (useGetEvents) si existen
@@ -228,8 +200,6 @@ export default function GymCalendar({ data, onWeekChange }: GymCalendarProps) {
             const endDate = baseWeek.add(6, 'day').format('YYYY-MM-DD');
             onWeekChange?.(startDate, endDate);
           }}
-          selectable
-          onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
           startAccessor="start"
           endAccessor="end"
@@ -251,7 +221,7 @@ export default function GymCalendar({ data, onWeekChange }: GymCalendarProps) {
           components={{
             event: ({ event }: { event: RBCEvent }) => {
               const monitor = event?.monitor ?? '';
-              const time = `${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`;
+              const time = `${toIsoDateString(event.start, 'HH:mm')} - ${toIsoDateString(event.end, 'HH:mm')}`;
 
               return (
                 <div className="flex flex-col items-left justify-center mt-1">
@@ -303,6 +273,9 @@ export default function GymCalendar({ data, onWeekChange }: GymCalendarProps) {
           <div className="flex justify-end gap-4 mt-4">
             <Button variant="ghost" onClick={() => setShowDeleteModal(false)}>
               Cancelar
+            </Button>
+            <Button variant="outline" onClick={handleEditEvent}>
+              Editar
             </Button>
             <Button variant="destructive" onClick={handleDeleteEvent}>
               Eliminar

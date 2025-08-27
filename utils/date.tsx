@@ -5,8 +5,11 @@ export const formatDisplayDate = (date: Date | undefined) => {
   return dayjs(date).format('MMMM DD, YYYY');
 };
 
-export const toIsoDateString = (date: Date): string => {
-  return dayjs(date).format('YYYY-MM-DD');
+export const toIsoDateString = (
+  date: Date | string,
+  format: string = 'YYYY-MM-DD',
+): string => {
+  return dayjs(date).format(format);
 };
 
 export const isValidDate = (date: Date | undefined) => {

@@ -1,4 +1,5 @@
 'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -13,20 +14,24 @@ import Image from 'next/image';
 
 import { FieldValues, Path } from 'react-hook-form';
 
+import { GenericDrawer } from '@/components/generic-drawer';
+import { AvatarSections } from '@/components/sections/avatar-sections';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import { LITERALS } from '@/data/literals';
 import { useDeleteBooking } from '@/hooks/class/use-delete-booking';
 import { usePostBooking } from '@/hooks/class/use-post-booking';
 import { useGetUsers } from '@/hooks/users/use-get-users';
+import { dayjs } from '@/lib/dayjs';
 import type { ClassEvent } from '@/types';
+import { IconBrandInstagram, IconBrandTiktok } from '@tabler/icons-react';
 import { ClockIcon, MapPinIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { GenericDrawer } from '../generic-drawer';
-import { AspectRatio } from '../ui/aspect-ratio';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Separator } from '../ui/separator';
 
 type FieldOption = {
   value: string;
@@ -156,6 +161,12 @@ export default function BookingSheetForm<T extends FieldValues>({
 
   const { room, endTime, startTime, monitor } = data || {};
 
+  const isClassFinished = (() => {
+    if (!data?.date || !data?.endTime) return false;
+    const classEnd = dayjs(`${data.date}T${data.endTime}:00`);
+    return dayjs().isAfter(classEnd);
+  })();
+
   const handleOpenChange = (nextOpen: boolean) => {
     if (isControlled) {
       (setOpen as (o: boolean) => void)(nextOpen);
@@ -163,8 +174,6 @@ export default function BookingSheetForm<T extends FieldValues>({
       setInternalOpen(nextOpen);
     }
   };
-
-  console.log('isUserBooked', isUserBooked);
 
   return (
     <Sheet open={actualOpen} onOpenChange={handleOpenChange}>
@@ -218,10 +227,10 @@ export default function BookingSheetForm<T extends FieldValues>({
           <Button
             className="h-12"
             type="submit"
-            disabled={isPending || isUserBooked}
+            disabled={isPending || isUserBooked || isClassFinished}
             onClick={handleBooking}
           >
-            Reservar
+            {isClassFinished ? 'Finalizada' : isUserBooked ? 'Reservado' : 'Reservar'}
           </Button>
           <SheetClose asChild>
             <Button
@@ -244,12 +253,12 @@ const ParticipantList = ({ participantsList }: Pick<ClassEvent, 'participantsLis
   const list = Array.isArray(participantsList) ? participantsList : [];
 
   if (list.length === 0) return null;
-
+  console.log('list', list);
   return (
     <div className="px-4 pb-4">
       <ul className="grid grid-cols-5 gap-3">
         {list.map((p) => (
-          <li key={p.id} className="flex items-center justify-center">
+          <li key={p?.id} className="flex items-center justify-center">
             <GenericDrawer
               trigger={
                 <Avatar
@@ -269,7 +278,27 @@ const ParticipantList = ({ participantsList }: Pick<ClassEvent, 'participantsLis
             >
               <div className="p-4">
                 <h2 className="text-lg font-semibold">Perfil publico</h2>
-                {/* Tu contenido aquí */}
+                <div className="flex flex-col gap-4 justify-center items-center my-8">
+                  <AvatarSections isAvatar name={p.name ?? ''} status={false} />
+                  <h2 className="text-lg font-semibold">
+                    {p?.name} {p?.surname}
+                  </h2>
+                  <div className="flex flex-row gap-2">
+                    {p.instagram && (
+                      <Link
+                        href={`https://www.instagram.com/${p.instagram}`}
+                        target="_blank"
+                      >
+                        <IconBrandInstagram className="w-6 h-6" />
+                      </Link>
+                    )}
+                    {p.tiktok && (
+                      <Link href={`https://www.tiktok.com/${p.tiktok}`} target="_blank">
+                        <IconBrandTiktok className="w-6 h-6" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
             </GenericDrawer>
           </li>

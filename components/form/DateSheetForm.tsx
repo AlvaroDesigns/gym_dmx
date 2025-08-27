@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import { FieldValues, Path } from 'react-hook-form';
 
 import { useGetEvents } from '@/hooks/events/use-get-events';
+import { toIsoDateString } from '@/utils/date';
 import { useMemo, useState } from 'react';
 
 type FieldOption = {
@@ -97,8 +98,8 @@ export default function DateSheetForm<T extends FieldValues>({
         <DateStrip
           classesPerDay={data?.map((cls) => ({
             ...cls,
-            color: `border-l-${cls.color}`,
-            date: dayjs(cls.date).format('YYYY-MM-DD'),
+            color: cls?.color,
+            date: toIsoDateString(cls?.date, 'YYYY-MM-DD'),
           }))}
         />
       </SheetContent>
