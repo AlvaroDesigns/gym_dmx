@@ -1,12 +1,13 @@
 'use client';
 
-import { Input } from '@/components//ui/input';
-import { Label } from '@/components//ui/label';
 import { BottomTabs } from '@/components/bottom-tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { AvatarSections } from '@/components/sections/avatar-sections';
 import { Button } from '@/components/ui/button';
 import { FormItem } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useGetUsers } from '@/hooks/users/use-get-users';
+import { IconBrandInstagram, IconBrandTiktok } from '@tabler/icons-react';
 
 export default function Page() {
   const { data } = useGetUsers({
@@ -20,11 +21,8 @@ export default function Page() {
       <div className="@container/main flex flex-1 flex-col gap-2">
         {/* User */}
         <div className="flex flex-col gap-4 p-6 md:gap-6 md:py-6">
-          <div className="flex justify-center gap-4 items-center">
-            <Avatar className="h-30 w-30">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
-            </Avatar>
+          <div className="flex justify-center mt-5 items-center">
+            <AvatarSections isAvatar name={user?.name ?? ''} size="lg" />
           </div>
         </div>
         {/* Class */}
@@ -42,24 +40,30 @@ export default function Page() {
               />
             </FormItem>
             <FormItem className="w-full">
-              <Label htmlFor="name">Instagram</Label>
-              <Input
-                className="h-12"
-                type="text"
-                id="name"
-                defaultValue={user?.instagram ?? ''}
-                placeholder="www.instagram.com/tu_usuario"
-              />
+              <Label htmlFor="instagram">Instagram</Label>
+              <div className="relative">
+                <IconBrandInstagram className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  className="h-12 pl-10"
+                  type="text"
+                  id="instagram"
+                  defaultValue={user?.instagram ?? ''}
+                  placeholder="www.instagram.com/tu_usuario"
+                />
+              </div>
             </FormItem>
             <FormItem className="w-full">
-              <Label htmlFor="name">TikTok</Label>
-              <Input
-                className="h-12"
-                type="text"
-                id="name"
-                defaultValue={user?.tiktok ?? ''}
-                placeholder="www.tiktok.com/@tu_usuario"
-              />
+              <Label htmlFor="tiktok">TikTok</Label>
+              <div className="relative">
+                <IconBrandTiktok className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  className="h-12 pl-10"
+                  type="text"
+                  id="tiktok"
+                  defaultValue={user?.tiktok ?? ''}
+                  placeholder="www.tiktok.com/@tu_usuario"
+                />
+              </div>
             </FormItem>
             <Button className="h-12 mt-3" type="submit">
               Guardad Cambios

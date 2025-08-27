@@ -1,4 +1,4 @@
-import { HomeIcon, UserIcon } from '@heroicons/react/24/outline';
+import { IconHome, IconUser } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { Fragment } from 'react';
 
@@ -31,18 +31,18 @@ export const BottomTabs = () => {
       {MOBILE.map((item) => (
         <Fragment key={item.id}>
           {item?.id === 'home' ? (
-            <div className="relative -mt-10">
+            <div className="relative -mt-10 -ml-6">
               <button
                 className="flex items-center justify-center w-16 h-16 text-white rounded-full shadow-lg bg-primary"
                 onClick={() => router.push(item.href)}
               >
-                <HomeIcon className="w-5 h-5 text-white" />
+                <IconHome className="w-5 h-5 text-white" />
               </button>
             </div>
           ) : (
             <div onClick={() => router.push(item.href)}>
               <div className="flex flex-col items-center text-gray-600">
-                <UserIcon className="w-5 h-5 text-black" />
+                <IconUser className="w-5 h-5 text-black" />
                 <span className="text-xs">{item.text}</span>
               </div>
             </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { BookingUser } from '@/app/user/home/components/booking-user';
+import { BookingList } from '@/app/user/home/components/booking-list';
 import { BottomTabs } from '@/components/bottom-tabs';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import {
@@ -10,13 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useClasses } from '@/hooks/useClasses';
+import { useGetEvents } from '@/hooks/events/use-get-events';
 import { useGetUsers } from '@/hooks/users/use-get-users';
 import { dayjs } from '@/lib/dayjs';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { BookingHeader } from './components/booking-header';
+import { BookingUser } from './components/booking-user';
 
 export default function Page() {
   const { data: session } = useSession();
@@ -24,13 +25,36 @@ export default function Page() {
   const { data: users } = useGetUsers({ roles: [], email: sessionEmail });
   const user = users?.[0];
 
-  const { events, loadEvents } = useClasses();
+  const startDate = useMemo(() => dayjs().startOf('week').format('YYYY-MM-DD'), []);
+  const endDate = useMemo(
+    () => dayjs().startOf('week').add(6, 'day').format('YYYY-MM-DD'),
+    [],
+  );
+  const { data: calendarData } = useGetEvents({ startDate, endDate });
 
-  useEffect(() => {
-    const startDate = dayjs().startOf('week').format('YYYY-MM-DD');
-    const endDate = dayjs().startOf('week').add(6, 'day').format('YYYY-MM-DD');
-    loadEvents(startDate, endDate);
-  }, [loadEvents]);
+  const events = useMemo(() => {
+    const data = calendarData ?? [];
+    return data
+      .map((e) => {
+        const start = new Date(`${e.date}T${e.startTime}:00`);
+        const end = new Date(`${e.date}T${e.endTime}:00`);
+        return {
+          ...e,
+          id: e.id,
+          title: e.label,
+          description: e.description,
+          color: e.color,
+          room: e.room,
+          participants: e.participants,
+          maxCapacity: e.maxCapacity,
+          participantsList: e.participantsList,
+          allDay: false,
+          start,
+          end,
+        };
+      })
+      .sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0));
+  }, [calendarData]);
 
   // Filtra eventos donde el usuario actual está en la lista de participantes
   const userEvents = useMemo(() => {
@@ -51,7 +75,7 @@ export default function Page() {
         <BookingHeader user={user ?? {}} />
 
         {/* Reservas del usuario */}
-        <BookingUser events={userEvents} />
+        <BookingList events={userEvents} />
 
         {/* workout */}
         <div className="flex flex-col">
@@ -69,7 +93,7 @@ export default function Page() {
                 </AspectRatio>
               </CardContent>
               <CardHeader className="absolute z-10 bottom-3 w-full">
-                <CardTitle className="text-xl font-bold  text-white">
+                <CardTitle className="text-xl font-bold text-white">
                   Pulsa para entrenar
                 </CardTitle>
                 <CardDescription className="text-gray-100">
@@ -79,6 +103,8 @@ export default function Page() {
             </Card>
           </div>
         </div>
+        {/* Botón fijo sobre BottomTabs con hueco inferior para el botón circular */}
+        <BookingUser />
         {/* BottomTabs */}
         <BottomTabs />
       </div>

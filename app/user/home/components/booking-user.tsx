@@ -1,92 +1,21 @@
-'use client';
-
-import BookingSheetForm from '@/components/form/BookingSheetForm';
 import DateSheetForm from '@/components/form/DateSheetForm';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import type { ClassEvent } from '@/hooks/useClasses';
-import { toIsoDateString } from '@/utils/date';
-import { IconCalendarClock, IconQuestionMark } from '@tabler/icons-react';
-import Image from 'next/image';
-import { Fragment } from 'react';
 
-export function BookingUser({ events }: { events: ClassEvent[] }) {
+export function BookingUser() {
   return (
-    <div className="flex flex-col">
-      <div className="flex justify-between items-center px-6">
-        <h2 className="text-xl font-bold">Agenda</h2>
-        <DateSheetForm fullWidth>
-          <p>Reservar</p>
-        </DateSheetForm>
-      </div>
-
-      <div className="flex flex-col gap-4 p-6 pt-3 md:gap-6 md:py-6">
-        {events?.length === 0 && (
-          <Alert>
-            <IconQuestionMark className="w-6 h-6" />
-            <>
-              <AlertTitle>No tienes reservas esta semana</AlertTitle>
-              <AlertDescription>
-                Elige una fecha y hora para reservar una clase.
-              </AlertDescription>
-            </>
-          </Alert>
-        )}
-
-        {events?.map((evt, index) => (
-          <Fragment key={index}>
-            <BookingSheetForm
-              classId={evt.id}
-              label={evt.title}
-              fullWidth
-              data={{
-                room: evt?.room,
-                date: toIsoDateString(evt?.start, 'YYYY-MM-DD'),
-                startTime: toIsoDateString(evt?.start, 'HH:mm'),
-                endTime: toIsoDateString(evt?.end, 'HH:mm'),
-                monitor: evt?.monitor,
-                participantsList: evt?.participantsList,
-              }}
-            >
-              <Card className="w-full flex flex-row p-0 gap-4 pt-0 items-stretch">
-                <CardHeader className="!p-0 w-28 md:w-40 shrink-0 gap-0">
-                  <AspectRatio ratio={1} className="bg-muted rounded-sm overflow-hidden">
-                    <Image
-                      fill
-                      alt="Photo by Drew Beamer"
-                      src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
-                      className="h-full w-full rounded-sm object-cover dark:brightness-[0.2] dark:grayscale"
-                    />
-                  </AspectRatio>
-                </CardHeader>
-                <CardContent className="px-4 p-0 gap-1 flex-1 flex flex-col justify-center">
-                  <CardTitle className="text-xl font-semibold">{evt?.title}</CardTitle>
-                  <CardDescription>
-                    <p className="flex flex-row text-md items-center justify-start -ml-1">
-                      <IconCalendarClock className="h-4 mr-1" />
-                      {toIsoDateString(evt?.start, 'DD/MM/YY · HH:mm')}
-                    </p>
-                    <div className="flex flex-row items-center justify-start gap-2">
-                      <Badge variant="success" className="h-4 px-2" />
-                      <p className="flex flex-row text-md items-center justify-start -ml-1 text-muted-foreground">
-                        Clase reservada
-                      </p>
-                    </div>
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            </BookingSheetForm>
-          </Fragment>
-        ))}
-      </div>
+    <div className="fixed left-0 right-0 bottom-22 px-4 z-40">
+      <DateSheetForm fullWidth>
+        <button
+          className="relative w-full h-14 bg-primary text-white rounded-xl shadow-lg"
+          style={{
+            WebkitMaskImage:
+              'radial-gradient(66px 36px at 50% 120%, transparent 36px, white 37px)',
+            maskImage:
+              'radial-gradient(66px 36px at 50% 120%, transparent 36px, white 37px)',
+          }}
+        >
+          Reservar clase
+        </button>
+      </DateSheetForm>
     </div>
   );
 }
