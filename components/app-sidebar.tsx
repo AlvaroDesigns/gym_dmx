@@ -13,7 +13,6 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconMoneybagEdit,
-  IconSearch,
   IconSettings,
   IconUsers,
 } from '@tabler/icons-react';
@@ -140,19 +139,14 @@ const data = {
   ],
   navSecondary: [
     {
-      title: 'Settings',
-      url: '#',
+      title: 'Configuración',
+      url: ROUTES_URL.SETTINGS,
       icon: IconSettings,
     },
     {
       title: 'Get Help',
       url: '#',
       icon: IconHelp,
-    },
-    {
-      title: 'Search',
-      url: '#',
-      icon: IconSearch,
     },
   ],
   documents: [],
@@ -199,7 +193,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItems} />
-
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

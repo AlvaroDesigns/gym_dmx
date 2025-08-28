@@ -9,21 +9,19 @@ import { getFieldsModalCalendar } from '@/data/modals';
 import { useGetEvents } from '@/hooks/events/use-get-events';
 import { usePostEvents } from '@/hooks/events/use-post-events';
 import { useGetMaestres } from '@/hooks/use-get-maesters';
+import { ClassData, DifficultyType } from '@/types';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-type ClassFormValues = {
+type ClassFormValues = Omit<ClassData, 'name'> & {
   className: string;
-  description: string;
   startTime: string;
   endTime: string;
-  room: string;
-  maxCapacity: number;
   monitor: string;
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  difficulty: DifficultyType;
   date: string;
 };
 

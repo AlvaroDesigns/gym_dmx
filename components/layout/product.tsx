@@ -1,3 +1,11 @@
+import { AppSidebar } from '@/components/app-sidebar';
+import EditSheetForm from '@/components/form/EditSheetForm';
+import { PageHeader } from '@/components/page-header';
+import { SiteHeader } from '@/components/site-header';
+import SkeletonHome from '@/components/skeletons';
+import { Button } from '@/components/ui/button';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { ViewToggle } from '@/components/ui/view-toggle';
 import { getFieldsModalZones } from '@/data/modals';
 import { useCreateZone } from '@/hooks/zones/use-zones';
 import { CLASS_TYPE, ZONE_TYPE } from '@/types';
@@ -6,22 +14,12 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { AppSidebar } from '../app-sidebar';
-import EditSheetForm from '../form/EditSheetForm';
-import { PageHeader } from '../page-header';
-import { SiteHeader } from '../site-header';
-import SkeletonUsers from '../skeletons/skeleton-user';
-import { Button } from '../ui/button';
-import { SidebarInset, SidebarProvider } from '../ui/sidebar';
-import { ViewToggle } from '../ui/view-toggle';
 
 type View = 'default' | 'compiled';
 
 interface ProductLayoutProps {
   children: React.ReactNode;
-  isButton?: boolean;
   isView?: boolean;
-  textButton?: string;
   isLoading?: boolean;
   onChangeView?: (value: View) => void;
   view?: View;
@@ -145,7 +143,7 @@ export const ProductLayout = ({
                     ))}
                 </div>
               </div>
-              {isLoading ? <SkeletonUsers /> : children}
+              {isLoading ? <SkeletonHome /> : children}
             </div>
           </div>
         </div>

@@ -1,7 +1,10 @@
 'use client';
 
+import { BookingHeader } from '@/app/user/home/components/booking-header';
 import { BookingList } from '@/app/user/home/components/booking-list';
+import { BookingUser } from '@/app/user/home/components/booking-user';
 import { BottomTabs } from '@/components/bottom-tabs';
+import SkeletonHome from '@/components/skeletons';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import {
   Card,
@@ -11,13 +14,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useGetEvents } from '@/hooks/events/use-get-events';
+import type { ClassEvent as RBCEvent } from '@/hooks/useClasses';
 import { useGetUsers } from '@/hooks/users/use-get-users';
 import { dayjs } from '@/lib/dayjs';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useMemo } from 'react';
-import { BookingHeader } from './components/booking-header';
-import { BookingUser } from './components/booking-user';
 
 export default function Page() {
   const { data: session } = useSession();
@@ -30,7 +32,7 @@ export default function Page() {
     () => dayjs().startOf('week').add(6, 'day').format('YYYY-MM-DD'),
     [],
   );
-  const { data: calendarData } = useGetEvents({ startDate, endDate });
+  const { data: calendarData, isLoading } = useGetEvents({ startDate, endDate });
 
   const events = useMemo(() => {
     const data = calendarData ?? [];
@@ -70,44 +72,62 @@ export default function Page() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-6">
+      <div className="@container/main flex flex-1 flex-col gap-4">
         {/* User */}
         <BookingHeader user={user ?? {}} />
 
         {/* Reservas del usuario */}
-        <BookingList events={userEvents} />
+        {RenderHome(userEvents, isLoading)}
 
-        {/* workout */}
-        <div className="flex flex-col">
-          <h2 className="text-xl font-bold px-6">Entrenamiento</h2>
-          <div className="flex flex-row gap-4 p-6 pt-3 md:gap-6 md:py-6 overflow-auto">
-            <Card className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
-              <CardContent className="p-0">
-                <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg">
-                  <Image
-                    src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
-                    alt="Photo by Drew Beamer"
-                    fill
-                    className="h-full w-full rounded-lg object-cover dark:brightness-[0.2] dark:grayscale"
-                  />
-                </AspectRatio>
-              </CardContent>
-              <CardHeader className="absolute z-10 bottom-3 w-full">
-                <CardTitle className="text-xl font-bold text-white">
-                  Pulsa para entrenar
-                </CardTitle>
-                <CardDescription className="text-gray-100">
-                  Elige una rutina o crea tu propio entrenamiento
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-        </div>
-        {/* Botón fijo sobre BottomTabs con hueco inferior para el botón circular */}
-        <BookingUser />
         {/* BottomTabs */}
         <BottomTabs />
       </div>
     </div>
   );
 }
+
+const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
+  if (isLoading) {
+    return (
+      <div className="flex flex-col px-6">
+        <SkeletonHome size="xs" numberOfItems={4} />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Reservas del usuario */}
+      <BookingList events={userEvents} />
+
+      {/* Workout */}
+      <div className="flex flex-col">
+        <h2 className="text-xl font-bold px-6">Entrenamiento</h2>
+        <div className="flex flex-row gap-4 p-6 pt-3 md:gap-6 md:py-6 overflow-auto">
+          <Card className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
+            <CardContent className="p-0">
+              <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg">
+                <Image
+                  src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
+                  alt="Photo by Drew Beamer"
+                  fill
+                  className="h-full w-full rounded-lg object-cover dark:brightness-[0.2] dark:grayscale"
+                />
+              </AspectRatio>
+            </CardContent>
+            <CardHeader className="absolute z-10 bottom-3 w-full">
+              <CardTitle className="text-xl font-bold text-white">
+                Pulsa para entrenar
+              </CardTitle>
+              <CardDescription className="text-gray-100">
+                Elige una rutina o crea tu propio entrenamiento
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
+      {/* Botón fijo sobre BottomTabs con hueco inferior para el botón circular */}
+      <BookingUser />
+    </>
+  );
+};

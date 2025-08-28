@@ -63,6 +63,10 @@ export const pageMetadata: Record<string, PageMetadata> = {
     title: 'Zonas',
     description: 'Administración de áreas y zonas del gimnasio',
   },
+  'admin/settings': {
+    title: 'Configuración',
+    description: 'Configuración del usuario',
+  },
 
   // Perfil de usuario
   user: {

@@ -194,23 +194,25 @@ export default function BookingSheetForm<T extends FieldValues>({
         <div>
           <div className="flex flex-col gap-4 px-4 md:gap-6 md:py-6">
             <div className="flex gap-4 items-center">
-              <div className="flex gap-4 items-center">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>{monitor?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col gap-2">
-                  <span className="text-[16px] leading-none font-semibold">
-                    {monitor}
-                  </span>
+              <div className="flex gap-4 items-center w-full">
+                <div className="flex flex-row items-center gap-2 w-1/2">
+                  <AvatarSections
+                    isAvatar
+                    name={monitor ?? ''}
+                    status={false}
+                    size="sm"
+                  />
+                  <p className="text-[16px] leading-none font-semibold">{monitor}</p>
+                </div>
+                <div className="flex flex-col gap-2 w-1/2 justify-center border-l border-border pl-4">
                   <div className="flex flex-row items-center gap-2">
-                    <ClockIcon className="w-5 h-5 text-black" />
+                    <ClockIcon className="w-4 h-4 text-muted-foreground" />
                     <span className="text-md leading-none text-muted-foreground">
                       {startTime} - {endTime}
                     </span>
                   </div>
                   <div className="flex flex-row items-center gap-2">
-                    <MapPinIcon className="w-5 h-5 text-black" />
+                    <MapPinIcon className="w-4 h-4 text-muted-foreground" />
                     <span className="text-md leading-none text-muted-foreground">
                       {room}
                     </span>

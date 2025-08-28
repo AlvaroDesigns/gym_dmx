@@ -41,4 +41,5 @@ export const TAILWIND_HEX_COLORS: Record<string, string> = {
   'sky-100': '#e0f2fe',
   'lime-100': '#ecfccb',
   'rose-100': '#ffe4e6',
+  'indigo-100': '#e0e7ff',
 };

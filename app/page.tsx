@@ -43,8 +43,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
       redirect: false,
     });
 
-    console.log('res', { email, password, res });
-
     if (res?.ok) {
       setMessageError(false);
 
@@ -65,19 +63,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
   const handleUser = async () => {
     return await fetch('/api/tools/import-users', { method: 'POST' });
-    const res = await fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: '',
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      console.log('User created');
-    } else {
-      console.log('Error: ' + data.error);
-    }
   };
 
   return (

@@ -3,7 +3,7 @@
 import TestimonialCard from '@/components/card-staff';
 import { DataTable } from '@/components/data-table';
 import { ProductLayout } from '@/components/layout/product';
-import SkeletonUsers from '@/components/skeletons/skeleton-user';
+import SkeletonHome from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ROUTES_URL } from '@/config/url';
@@ -59,7 +59,7 @@ export default function Page() {
       }}
     >
       {isLoading ? (
-        <SkeletonUsers />
+        <SkeletonHome />
       ) : (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4">

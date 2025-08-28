@@ -10,6 +10,7 @@ import { useGetClass } from '@/hooks/class/use-get-class';
 import { useCreateClass } from '@/hooks/class/use-post-class';
 import { useViewToggle } from '@/hooks/use-view-toggle';
 
+import { TAILWIND_HEX_COLORS } from '@/config/colors';
 import { LITERALS } from '@/data/literals';
 import { CLASS_TYPE, ClassData } from '@/types';
 import { IconPlus } from '@tabler/icons-react';
@@ -47,6 +48,7 @@ export default function Page() {
     createClassMutation.mutate(
       {
         ...data,
+        color: TAILWIND_HEX_COLORS[color as keyof typeof TAILWIND_HEX_COLORS],
       },
       {
         onSuccess: () => {

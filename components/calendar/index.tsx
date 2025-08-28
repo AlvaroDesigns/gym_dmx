@@ -4,18 +4,19 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 import { useClasses } from '@/hooks/useClasses';
 import { cn } from '@/lib/utils';
 
+import { Card } from '@/components/ui/card';
 import { TAILWIND_HEX_COLORS } from '@/config/colors';
+import { useGetUsers } from '@/hooks/users/use-get-users';
 import { dayjs } from '@/lib/dayjs';
 import { ClassEvent } from '@/types';
 import { toIsoDateString } from '@/utils/date';
-import 'dayjs/locale/es';
-import { Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import BookingSheetForm from '../form/BookingSheetForm';
-import { Card } from '../ui/card';
-import { Input } from '../ui/input';
 
-dayjs.locale('es');
+import BookingSheetForm from '@/components/form/BookingSheetForm';
+import { Input } from '@/components/ui/input';
+import type { UserData } from '@/types/user';
+import { Search } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
 interface DateStripProps {
   classesPerDay?: ClassEvent[];
@@ -30,6 +31,11 @@ export default function DateStripTabs({
   minDate = new Date(),
   maxDate = new Date('2025-09-07'),
 }: DateStripProps) {
+  const { data: session } = useSession();
+  const sessionEmail = (session?.user as { email?: string } | undefined)?.email;
+  const { data: users } = useGetUsers({ roles: [], email: sessionEmail });
+  const currentUser = users?.[0];
+
   const today = dayjs();
   const [currentWeekStart, setCurrentWeekStart] = useState(today.startOf('week'));
   const [selectedDate, setSelectedDate] = useState(today);
@@ -68,11 +74,18 @@ export default function DateStripTabs({
     loadEvents(startDate, endDate);
   }, [currentWeekStart, loadEvents]);
 
-  const mappedEvents: Partial<ClassEvent>[] = events.map((e) => ({
-    ...e,
+  const mappedEvents: ClassEvent[] = events.map((e) => ({
+    id: e.id,
     date: toIsoDateString(e?.start, 'YYYY-MM-DD'),
+    label: (e.title as string) || '',
+    color: e.color,
+    description: e.description,
+    room: e.room,
     startTime: toIsoDateString(e?.start, 'HH:mm'),
     endTime: toIsoDateString(e?.end, 'HH:mm'),
+    participants: e?.participants,
+    maxCapacity: e?.maxCapacity,
+    monitor: e?.monitor,
     participantsList: e?.participantsList || [],
   }));
 
@@ -194,37 +207,36 @@ export default function DateStripTabs({
               setOpen={(o: boolean) => setOpenIndex(o ? i : null)}
             >
               <Card
-                className="p-2 mb-4 rounded-lg text-sm flex justify-center px-4 py-2 min-h-14"
+                className="py2 mb-4 rounded-lg text-sm flex justify-center px-4 py-2 min-h-16"
                 style={{
                   borderLeft: `8px solid ${TAILWIND_HEX_COLORS[cls?.color as keyof typeof TAILWIND_HEX_COLORS]}`,
                 }}
               >
-                <div className="flex flex-row gap-2 justify-between w-full items-start">
-                  <div>
-                    <span className="text-md leading-none text-muted-foreground mt-2">
-                      {cls.startTime && cls.endTime
-                        ? `${cls.startTime} - ${cls.endTime}`
+                <div className="flex flex-row justify-between w-full items-start mt-2">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[1.05rem] leading-none text-muted-foreground">
+                      {cls?.startTime && cls?.endTime
+                        ? `${cls?.startTime} - ${cls?.endTime}`
                         : '08:00 - 10:00'}
                     </span>
                     <h2 className="text-[20px] leading-none font-semibold uppercase">
-                      {cls.label}
+                      {cls?.label}
                     </h2>
                   </div>
-                  {dayjs().isAfter(dayjs(`${cls.date}T${cls.endTime || '10:00'}:00`)) && (
-                    <div className="mt-2 flex justify-end gap-2 text-s text-muted-foreground">
-                      <div className="bg-gray-200 text-gray-500 dark:bg-gray-200 px-2 py-0.5 rounded-md">
-                        Finalizada
-                      </div>
+                  <CalendarStatus
+                    date={cls?.date}
+                    endTime={cls?.endTime || '10:00'}
+                    participantsList={cls?.participantsList || []}
+                    currentUser={currentUser}
+                  />
+                </div>
+                <div className="flex justify-end gap-2 text-s text-muted-foreground">
+                  {cls?.participants && cls?.maxCapacity && (
+                    <div className="bg-blue-500 text-white dark:bg-blue-600 px-2 py-0.5 rounded-md">
+                      {cls?.participants}/{cls?.maxCapacity} participantes
                     </div>
                   )}
                 </div>
-                {cls.participants && cls.maxCapacity && (
-                  <div className="mt-2 flex justify-end gap-2 text-s text-muted-foreground">
-                    <div className="bg-blue-500 text-white dark:bg-blue-600 px-2 py-0.5 rounded-md">
-                      {cls.participants}/{cls.maxCapacity} participantes
-                    </div>
-                  </div>
-                )}
               </Card>
             </BookingSheetForm>
           ))
@@ -235,3 +247,46 @@ export default function DateStripTabs({
     </div>
   );
 }
+
+interface CalendarStatusProps {
+  date: ClassEvent['date'];
+  endTime: ClassEvent['endTime'];
+  participantsList: ClassEvent['participantsList'];
+  currentUser: UserData | undefined;
+}
+
+const CalendarStatus = ({
+  date,
+  endTime,
+  participantsList,
+  currentUser,
+}: CalendarStatusProps) => {
+  const isAfter = dayjs().isAfter(dayjs(`${date}T${endTime}:00`));
+
+  if (isAfter) {
+    return (
+      <div className="mt-2 flex justify-end gap-2 text-s text-muted-foreground">
+        <div className="bg-gray-200 text-gray-500 dark:bg-gray-200 px-2 py-0.5 rounded-md">
+          Finalizada
+        </div>
+      </div>
+    );
+  }
+
+  if (Array.isArray(participantsList) && currentUser) {
+    return (
+      <>
+        {currentUser &&
+          participantsList.some(
+            (p) => p?.name === currentUser?.name && p?.surname === currentUser?.surname,
+          ) && (
+            <div className="bg-emerald-500 text-white px-2 py-0.5 rounded-md">
+              Reservada
+            </div>
+          )}
+      </>
+    );
+  }
+
+  return null;
+};

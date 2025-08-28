@@ -1,9 +1,10 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { IconLogout } from '@tabler/icons-react';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
 import { DynamicBreadcrumb } from './dynamic-breadcrumb';
 
 export function SiteHeader() {
@@ -19,16 +20,19 @@ export function SiteHeader() {
           <DynamicBreadcrumb />
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-            <a
-              href="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
-              rel="noopener noreferrer"
-              target="_blank"
-              className="dark:text-foreground"
-            >
-              GitHub
-            </a>
-          </Button>
+          <Link
+            className="hidden sm:flex items-center gap-2"
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              signOut({ callbackUrl: '/' });
+            }}
+          >
+            <>
+              <p className="text-sm text-muted-foreground">Cerrar sesión</p>
+              <IconLogout className="h-4 text-muted-foreground" />
+            </>
+          </Link>
         </div>
       </div>
     </header>

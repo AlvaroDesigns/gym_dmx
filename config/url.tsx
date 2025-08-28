@@ -9,4 +9,5 @@ export const ROUTES_URL: Record<string, string> = {
   STAFF: '/admin/staff',
   STAFF_CREATE: '/admin/staff/create_staff',
   CUSTOMER_CREATE: '/admin/customers/create_user',
+  SETTINGS: '/admin/settings',
 };

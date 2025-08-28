@@ -1,4 +1,5 @@
 import { axiosInstance } from '@/lib/client';
+import { DifficultyType } from '@/types';
 import { UserData } from '@/types/user';
 import type { AxiosRequestConfig } from 'axios';
 
@@ -66,7 +67,7 @@ export interface PostCalendarPayload {
   room: string;
   maxCapacity: number;
   monitor: string; // userId del monitor
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  difficulty: DifficultyType;
 }
 
 export async function postCalendar(

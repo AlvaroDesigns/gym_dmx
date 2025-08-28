@@ -1,20 +1,10 @@
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
-import type { Difficulty, Weekday } from '@prisma/client';
+import type { ScheduleInput } from '@/types';
 import { getToken } from 'next-auth/jwt';
 import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
 
-type ScheduleInput = {
-  weekday: Weekday;
-  monitor: string;
-  difficulty: Difficulty;
-  capacity: number;
-  startTime: string;
-  endTime: string;
-};
-
-// POST - Crear una nueva clase
 export async function POST(request: NextRequest) {
   try {
     let isAuth = false;

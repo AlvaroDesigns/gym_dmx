@@ -3,7 +3,6 @@
 import {
   IconCreditCard,
   IconDotsVertical,
-  IconLogout,
   IconNotification,
   IconUserCircle,
 } from '@tabler/icons-react';
@@ -24,12 +23,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { signOut } from 'next-auth/react';
+import { UserData } from '@/types/user';
 
 interface User {
   user: {
-    name: string;
-    email: string;
+    name: UserData['name'];
+    email: UserData['email'];
     avatar: string;
   };
 }
@@ -95,15 +94,6 @@ export function NavUser({ user }: User) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-                signOut({ callbackUrl: '/' });
-              }}
-            >
-              <IconLogout />
-              Log out
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
