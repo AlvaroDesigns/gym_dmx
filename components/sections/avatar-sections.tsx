@@ -42,7 +42,7 @@ export const AvatarSections = ({
 };
 
 interface AvatarComponentProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 's' | 'sm' | 'md' | 'lg';
   image?: string;
   name: string;
 }
@@ -54,9 +54,11 @@ const AvatarComponent = ({
 }: AvatarComponentProps) => {
   return (
     <Avatar
+      title={name}
       className={cn(
-        size === 'md' && 'h-19 w-19',
+        size === 's' && 'h-12 w-12',
         size === 'sm' && 'h-14 w-14',
+        size === 'md' && 'h-19 w-19',
         size === 'lg' && 'h-24 w-24',
       )}
     >

@@ -255,23 +255,32 @@ const ParticipantList = ({ participantsList }: Pick<ClassEvent, 'participantsLis
   const list = Array.isArray(participantsList) ? participantsList : [];
 
   if (list.length === 0) return null;
-  console.log('list', list);
+
   return (
-    <div className="px-4 pb-4">
+    <div className="px-4 pb-4" id="participants-list">
       <ul className="grid grid-cols-5 gap-3">
         {list.map((p) => (
           <li key={p?.id} className="flex items-center justify-center">
             <GenericDrawer
               trigger={
-                <Avatar
-                  className="h-12 w-12"
-                  title={[p.name, p.surname].filter(Boolean).join(' ') || 'Sin nombre'}
-                >
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>
-                    {(p.name || p.surname || '?').toString().charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
+                p.privateProfile ? (
+                  <AvatarSections
+                    isAvatar
+                    name={p.name ?? ''}
+                    image={'https://github.com/evilrabbit.png'}
+                    size="s"
+                  />
+                ) : (
+                  <Avatar
+                    className="h-12 w-12"
+                    title={[p.name, p.surname].filter(Boolean).join(' ') || 'Sin nombre'}
+                  >
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>
+                      {(p.name || p.surname || '?').toString().charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                )
               }
               direction="bottom"
               modal
@@ -281,7 +290,11 @@ const ParticipantList = ({ participantsList }: Pick<ClassEvent, 'participantsLis
               <div className="p-4">
                 <h2 className="text-lg font-semibold">Perfil publico</h2>
                 <div className="flex flex-col gap-4 justify-center items-center my-8">
-                  <AvatarSections isAvatar name={p.name ?? ''} status={false} />
+                  <AvatarSections
+                    isAvatar
+                    name={p.name ?? ''}
+                    image={'https://github.com/evilrabbit.png'}
+                  />
                   <h2 className="text-lg font-semibold">
                     {p?.name} {p?.surname}
                   </h2>

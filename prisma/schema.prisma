@@ -21,6 +21,7 @@ model User {
   createdAt     DateTime    @default(now())
   lastOrderDate DateTime?
   roles         Role[]      @default([USER])
+  active        Boolean     @default(true)
   country       String
   lastName      String?
   name          String
