@@ -118,7 +118,7 @@ export default function DateStripTabs({
   });
 
   const noResultsMessage =
-    nonFinishedClasses.length === 0
+    nonFinishedClasses?.length === 0
       ? 'No hay clases este día'
       : 'No hay clases que coincidan con el filtro';
 

@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
             surname: true,
             instagram: true,
             tiktok: true,
+            privateProfile: true,
             roles: true,
           },
         },
@@ -79,6 +80,7 @@ export async function GET(request: NextRequest) {
           surname: i.user.surname,
           instagram: i.user.instagram,
           tiktok: i.user.tiktok,
+          privateProfile: i.user.privateProfile,
         }))
         .filter((u) => !!u.id);
 

@@ -32,6 +32,7 @@ export interface ParticipantData {
   surname: string | null;
   instagram?: string | null;
   tiktok?: string | null;
+  privateProfile?: boolean;
 }
 
 export interface ClassEvent {

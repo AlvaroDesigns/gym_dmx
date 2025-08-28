@@ -6,44 +6,11 @@ import { authOptions } from '../auth/[...nextauth]/route';
 
 import { prisma } from '@/lib/prisma';
 import { UserUpdateData } from '@/types/user';
-import { Gender, PaymentStatus, PaymentType, Role } from '@prisma/client';
+import { Gender, PaymentStatus, PaymentType, Prisma, Role } from '@prisma/client';
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    //  sessión
-    console.log('-----session', session);
-    /*
-    if (session) {
-      return new NextResponse(JSON.stringify({ error: 'unauthorized' }), {
-        status: 401,
-      });
-    }
-*/
-    // const body = await request.json();
-    /*
-    const hashedPassword = await hash('Test123', 10);
-
-    const user = await prisma.user.create({
-      data: {
-        name: 'Alvaro',
-        surname: 'Saiz',
-        lastName: null,
-        birthDate: new Date('1990-01-01'),
-        gender: 'M',
-        dni: '7452236T',
-        phone: '665161387',
-        postalCode: '16660',
-        address: 'C/ Montejano 72',
-        city: 'Pedroñeras, Las',
-        country: 'España',
-        province: 'Cuenca',
-        email: 'hello@alvarodesigns.com',
-        password: hashedPassword,
-        lastOrderDate: new Date('2025-07-15'),
-        roles: ['ADMIN'],
-      },
-    });*/
+    // const session = await getServerSession(authOptions);
 
     const body = await request.json();
 
@@ -94,6 +61,8 @@ export async function POST(request: Request) {
         email: body.email,
         password: hashedPassword,
         roles: body.roles || [Role.USER],
+        privateProfile:
+          typeof body.privateProfile === 'boolean' ? body.privateProfile : undefined,
       },
     });
 
@@ -112,18 +81,15 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ message: 'User created', user }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 },
-    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    console.log('-----session', session);
+    //const session = await getServerSession(authOptions);
 
     const body = await request.json();
     const { dni, ...updateData } = body;
@@ -184,6 +150,10 @@ export async function PUT(request: Request) {
       province: updateData.provincia,
       email: updateData.email,
       roles: updateData.roles || existingUser.roles,
+      privateProfile:
+        typeof updateData.privateProfile === 'boolean'
+          ? updateData.privateProfile
+          : undefined,
     };
 
     // Only update password if provided
@@ -201,11 +171,9 @@ export async function PUT(request: Request) {
       { message: 'User updated', user: updatedUser },
       { status: 200 },
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 },
-    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -229,10 +197,16 @@ export async function GET(request: NextRequest) {
     const email = searchParams.get('email');
 
     // Construir filtro dinámico
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
 
     if (roles) {
-      where.roles = { has: roles }; // Si roles es un array. Si es relación, cambia a: { some: { name: role } }
+      const roleValues = roles
+        .split(',')
+        .map((r) => r.trim())
+        .filter((r): r is Role => ['USER', 'ADMIN', 'EMPLOYEE'].includes(r as Role));
+      if (roleValues.length > 0) {
+        where.roles = { hasSome: roleValues };
+      }
     }
 
     if (doc) {
@@ -245,14 +219,34 @@ export async function GET(request: NextRequest) {
 
     const users = await prisma.user.findMany({
       where,
+      select: {
+        id: true,
+        birthDate: true,
+        gender: true,
+        dni: true,
+        phone: true,
+        postalCode: true,
+        address: true,
+        city: true,
+        province: true,
+        email: true,
+        createdAt: true,
+        lastOrderDate: true,
+        roles: true,
+        country: true,
+        lastName: true,
+        name: true,
+        surname: true,
+        instagram: true,
+        tiktok: true,
+        privateProfile: true,
+      },
     });
 
     return NextResponse.json(Array.isArray(users) ? users : [], { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 },
-    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -293,10 +287,8 @@ export async function DELETE(request: Request) {
     });
 
     return NextResponse.json({ message: 'User deleted successfully' }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 },
-    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

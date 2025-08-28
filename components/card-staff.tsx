@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
+import { AvatarSections } from './sections/avatar-sections';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -88,6 +89,7 @@ const TestimonialCard = ({
       <Card className="relative w-full flex flex-row bg-background shadow border-none">
         <CardContent className="flex flex-row gap-4 px-6 w-full">
           <div className="flex items-center gap-3 w-full">
+            <AvatarSections isAvatar name={name} status={false} />
             <Avatar className="h-16 w-16 sm:h-18 sm:w-18">
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>{name.charAt(0)}</AvatarFallback>

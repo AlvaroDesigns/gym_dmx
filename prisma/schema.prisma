@@ -26,6 +26,7 @@ model User {
   name          String
   surname       String
   password      String
+  privateProfile Boolean?    @default(true)
   instagram     String?
   tiktok        String?
   payments      Payment[]

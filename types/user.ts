@@ -16,6 +16,7 @@ export interface UserData {
   password?: string;
   instagram?: string | null;
   tiktok?: string | null;
+  privateProfile?: boolean;
 }
 
 export interface UserUpdateData {
@@ -35,4 +36,5 @@ export interface UserUpdateData {
   password?: string;
   instagram?: string | null;
   tiktok?: string | null;
+  privateProfile?: boolean;
 }
