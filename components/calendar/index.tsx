@@ -103,7 +103,12 @@ export default function DateStripTabs({
     (c) => c.date === toIsoDateString(selectedDate.toDate()),
   );
 
-  const filteredClasses = selectedDayClasses.filter((c) => {
+  // Excluir clases ya finalizadas
+  const nonFinishedClasses = selectedDayClasses.filter((c) =>
+    dayjs().isBefore(dayjs(`${c.date}T${c.endTime || '23:59'}:00`)),
+  );
+
+  const filteredClasses = nonFinishedClasses.filter((c) => {
     if (!filter) return true;
     const text = filter.toLowerCase();
     return (
@@ -113,7 +118,7 @@ export default function DateStripTabs({
   });
 
   const noResultsMessage =
-    selectedDayClasses.length === 0
+    nonFinishedClasses.length === 0
       ? 'No hay clases este día'
       : 'No hay clases que coincidan con el filtro';
 

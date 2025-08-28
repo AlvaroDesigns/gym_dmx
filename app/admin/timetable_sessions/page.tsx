@@ -62,7 +62,7 @@ export default function Page() {
       maxCapacity: 20,
       monitor: '',
       difficulty: 'MEDIUM',
-      date: '2025-08-19',
+      date: dayjs(new Date()).format('YYYY-MM-DD'),
     },
   });
 

@@ -67,6 +67,7 @@ export default function Page() {
           (p) => p.name === user?.name && p.surname === user?.surname,
         ),
       )
+      .filter((evt) => dayjs().isBefore(dayjs(evt.end)))
       .sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0));
   }, [events, user]);
 
@@ -108,18 +109,18 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
             <CardContent className="p-0">
               <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg">
                 <Image
-                  src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
+                  src="/img/workout.png"
                   alt="Photo by Drew Beamer"
                   fill
                   className="h-full w-full rounded-lg object-cover dark:brightness-[0.2] dark:grayscale"
                 />
               </AspectRatio>
             </CardContent>
-            <CardHeader className="absolute z-10 bottom-3 w-full">
-              <CardTitle className="text-xl font-bold text-white">
+            <CardHeader className="absolute z-10 top-8 flex  flex-col justify-start w-1/2">
+              <CardTitle className="text-xl font-bold text-black">
                 Pulsa para entrenar
               </CardTitle>
-              <CardDescription className="text-gray-100">
+              <CardDescription className="text-gray-900 text-sm">
                 Elige una rutina o crea tu propio entrenamiento
               </CardDescription>
             </CardHeader>

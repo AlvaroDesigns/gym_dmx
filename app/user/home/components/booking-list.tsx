@@ -28,7 +28,7 @@ export function BookingList({ events }: { events: ClassEvent[] }) {
         {events?.length === 0 && (
           <Alert>
             <>
-              <AlertTitle className="text-lg">No tienes reservas esta semana</AlertTitle>
+              <AlertTitle className="text-lg">No tienes reservas activas</AlertTitle>
               <AlertDescription className="text-sm">
                 Elige una fecha y hora para reservar una clase.
               </AlertDescription>
