@@ -38,27 +38,50 @@ export const authOptions: NextAuthOptions = {
 
         if (!isValid) return null;
 
+        // Bloquear login si el usuario está inactivo
+        if (user.active === false) {
+          console.log('[Auth] Usuario inactivo');
+          return null;
+        }
+
         return user;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
+      const t = token as JWT & { id?: string; roles?: string[]; active?: boolean };
       if (user) {
-        const u = user as { id?: string; email?: string; roles?: Role[] };
-        const t = token as JWT & { id?: string; roles?: string[] };
+        const u = user as {
+          id?: string;
+          email?: string;
+          roles?: Role[];
+          active?: boolean;
+        };
         t.id = u.id;
         token.email = u.email ?? token.email;
         t.roles = u.roles?.map((r) => r.toString());
+        t.active = u.active;
+      }
+      // Refrescar desde BBDD en cada ciclo si hay email
+      if (token?.email) {
+        const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
+        if (dbUser) {
+          t.active = dbUser.active;
+          t.roles = (dbUser.roles ?? []).map((r) => r.toString());
+          t.id = dbUser.id;
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        const t = token as JWT & { id?: string; roles?: string[] };
-        (session.user as { id?: string; roles?: string[] }).id = t.id;
+        const t = token as JWT & { id?: string; roles?: string[]; active?: boolean };
+        (session.user as { id?: string; roles?: string[]; active?: boolean }).id = t.id;
         session.user.email = token.email ?? session.user.email ?? undefined;
-        (session.user as { id?: string; roles?: string[] }).roles = t.roles;
+        (session.user as { id?: string; roles?: string[]; active?: boolean }).roles =
+          t.roles;
+        (session.user as { active?: boolean }).active = t.active;
       }
       return session;
     },

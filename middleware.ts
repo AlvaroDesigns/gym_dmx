@@ -12,6 +12,15 @@ export async function middleware(request: NextRequest) {
     //return NextResponse.redirect(new URL('/', request.url));
   }
 
+  // Bloquear acceso si el usuario está inactivo
+  const isInactive = (token as { active?: boolean } | null)?.active === false;
+  const isAuthPage = pathname === '/' || pathname.startsWith('/api/auth');
+  if (isInactive && !isAuthPage) {
+    const url = new URL('/', request.url);
+    url.searchParams.set('inactive', '1');
+    return NextResponse.redirect(url);
+  }
+
   const tokenRolesUnknown = (token as { roles?: unknown })?.roles;
   const roles = Array.isArray(tokenRolesUnknown) ? (tokenRolesUnknown as string[]) : [];
 

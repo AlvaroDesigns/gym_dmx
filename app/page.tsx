@@ -1,19 +1,19 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { getSession, signIn } from 'next-auth/react';
+import { getSession, signIn, signOut } from 'next-auth/react';
 
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { AlertCircleIcon } from 'lucide-react';
+import { AlertCircleIcon, Eye, EyeOff } from 'lucide-react';
 
 import { ROUTES_URL } from '@/config/url';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function Home() {
@@ -28,7 +28,18 @@ export default function Home() {
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [messageError, setMessageError] = useState<boolean>(false);
+  const [inactiveError, setInactiveError] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const inactive = searchParams.get('inactive');
+    if (inactive === '1') {
+      setInactiveError(true);
+      setMessageError(false);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,6 +47,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     const formData = new FormData(e.currentTarget);
     const email = String(formData.get('email') ?? '');
     const password = String(formData.get('password') ?? '');
+
+    // Evitar sesiones previas
+    await signOut({ redirect: false });
 
     const res = await signIn('credentials', {
       email,
@@ -45,8 +59,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
     if (res?.ok) {
       setMessageError(false);
+      setInactiveError(false);
 
       const session = await getSession();
+
       const roles = (session?.user as { roles?: string[] } | undefined)?.roles ?? [];
       const isAdminOrEmployee = roles.includes('ADMIN') || roles.includes('EMPLOYEE');
 
@@ -57,6 +73,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
       }
     } else {
       setMessageError(true);
+      setInactiveError(false);
       toast.error('Usuario o contraseña incorrectos');
     }
   };
@@ -100,13 +117,30 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                     Forgot your password?
                   </a>
                 </div>
-                <Input
-                  className="h-12"
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    className="h-12 pr-10"
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3"
+                    aria-label={
+                      showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                    }
+                    title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <Button type="submit" className="h-12 w-full">
@@ -116,6 +150,14 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 <Alert variant="destructive">
                   <AlertCircleIcon />
                   <AlertTitle>Habido un error, intentalo de nuevo</AlertTitle>
+                </Alert>
+              )}
+              {inactiveError && (
+                <Alert variant="destructive">
+                  <AlertCircleIcon />
+                  <AlertTitle>
+                    Tu cuenta está inactiva. Contacta con administración.
+                  </AlertTitle>
                 </Alert>
               )}
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">

@@ -1,14 +1,5 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent } from '@/components/ui/card';
-import { ROLE_OPTIONS } from '@/data/model';
-import { useDeleteUsers } from '@/hooks/users/use-delete-users';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import z from 'zod';
-import { AvatarSections } from './sections/avatar-sections';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,12 +10,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from './ui/alert-dialog';
-import { Button } from './ui/button';
-import { Checkbox } from './ui/checkbox';
-import { Form, FormControl, FormField, FormItem, FormLabel } from './ui/form';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Sheet,
   SheetClose,
@@ -34,14 +26,32 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from './ui/sheet';
-import { Switch } from './ui/switch';
+} from '@/components/ui/sheet';
+import { Switch } from '@/components/ui/switch';
+import { LITERALS } from '@/data/literals';
+import { ROLE_OPTIONS } from '@/data/model';
+import { useDeleteUsers } from '@/hooks/users/use-delete-users';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import z from 'zod';
+import { AvatarSections } from './sections/avatar-sections';
 
 const FormSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
     message: 'You have to select at least one item.',
   }),
 });
+
+interface TestimonialCardProps {
+  name?: string;
+  staff?: string;
+  email?: string;
+  dni?: string;
+  editable?: boolean;
+  onClick?: () => void;
+}
 
 const TestimonialCard = ({
   name = 'Álvaro Saiz Bonilla',
@@ -50,14 +60,7 @@ const TestimonialCard = ({
   dni = '12345678J',
   editable = false,
   onClick,
-}: {
-  name?: string;
-  staff?: string;
-  email?: string;
-  dni?: string;
-  editable?: boolean;
-  onClick?: () => void;
-}) => {
+}: TestimonialCardProps) => {
   const [open, setOpen] = useState(false);
   const deleteUserMutation = useDeleteUsers();
 
@@ -74,13 +77,13 @@ const TestimonialCard = ({
 
   const handleDeleteUser = async () => {
     try {
-      await deleteUserMutation.mutateAsync({ dni });
-      // Optionally call onClick to refresh the parent component
+      await deleteUserMutation.mutateAsync({ id: dni });
+
       if (onClick) {
         onClick();
       }
-    } catch (error) {
-      console.error('Error deleting user:', error);
+    } catch {
+      toast.error(LITERALS.MESSAGES.ERROR);
     }
   };
 
@@ -90,10 +93,6 @@ const TestimonialCard = ({
         <CardContent className="flex flex-row gap-4 px-6 w-full">
           <div className="flex items-center gap-3 w-full">
             <AvatarSections isAvatar name={name} status={false} />
-            <Avatar className="h-16 w-16 sm:h-18 sm:w-18">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-            </Avatar>
             <div className="flex flex-col gap-1">
               <span className="text-[17px] leading-none font-semibold">{name}</span>
               <span className="text-sm leading-none text-muted-foreground font-bold">
