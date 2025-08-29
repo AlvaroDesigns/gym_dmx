@@ -17,7 +17,7 @@ export default function Page() {
                 src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
                 alt="Photo by Drew Beamer"
                 fill
-                className="h-full w-full rounded-lg object-cover dark:brightness-[0.2] dark:grayscale"
+                className="h-full w-full rounded-lg object-cover"
               />
             </AspectRatio>
           </div>

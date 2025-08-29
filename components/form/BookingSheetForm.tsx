@@ -188,7 +188,7 @@ export default function BookingSheetForm<T extends FieldValues>({
             fill
             src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
             alt="Photo by Drew Beamer"
-            className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            className="h-full w-full object-cover"
           />
         </AspectRatio>
         <div>

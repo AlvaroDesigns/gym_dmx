@@ -6,13 +6,7 @@ import { BookingUser } from '@/app/user/home/components/booking-user';
 import { BottomTabs } from '@/components/bottom-tabs';
 import SkeletonHome from '@/components/skeletons';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { useGetEvents } from '@/hooks/events/use-get-events';
 import type { ClassEvent as RBCEvent } from '@/hooks/useClasses';
 import { useGetUsers } from '@/hooks/users/use-get-users';
@@ -25,7 +19,8 @@ export default function Page() {
   const { data: session } = useSession();
   const sessionEmail = session?.user?.email ?? undefined;
   const { data: users } = useGetUsers({ roles: [], email: sessionEmail });
-  const user = users?.[0];
+  const usersArray = (Array.isArray(users) ? users : users?.data) ?? [];
+  const user = usersArray[0];
 
   const startDate = useMemo(() => dayjs().startOf('week').format('YYYY-MM-DD'), []);
   const endDate = useMemo(
@@ -106,24 +101,20 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
         <h2 className="text-xl font-bold px-6">Entrenamiento</h2>
         <div className="flex flex-row gap-4 p-6 pt-3 overflow-auto">
           <Card className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
-            <CardContent className="p-0">
-              <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg">
-                <Image
-                  src="/img/workout.png"
-                  alt="Photo by Drew Beamer"
-                  fill
-                  className="h-full w-full rounded-lg object-cover dark:brightness-[0.2] dark:grayscale"
-                />
-              </AspectRatio>
-            </CardContent>
-            <CardHeader className="absolute z-10 top-8 flex  flex-col justify-start w-1/2">
-              <CardTitle className="text-xl font-bold text-black">
-                Pulsa para entrenar
-              </CardTitle>
-              <CardDescription className="text-gray-900 text-sm">
+            <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg">
+              <Image
+                src="/img/workout.png"
+                alt="workout"
+                fill
+                className="h-full w-full rounded-lg object-cover"
+              />
+            </AspectRatio>
+            <div className="absolute z-10 top-8 flex mx-3 px-4 flex-col justify-start w-1/2">
+              <h3 className="text-xl font-bold text-black">Pulsa para entrenar</h3>
+              <p className="text-gray-900 text-sm">
                 Elige una rutina o crea tu propio entrenamiento
-              </CardDescription>
-            </CardHeader>
+              </p>
+            </div>
           </Card>
         </div>
       </div>

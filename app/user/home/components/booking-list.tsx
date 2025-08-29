@@ -58,7 +58,7 @@ export function BookingList({ events }: { events: ClassEvent[] }) {
                       fill
                       alt="Photo by Drew Beamer"
                       src="https://dmxgym.com/wp-content/uploads/2024/05/trx.png"
-                      className="h-full w-full rounded-sm object-cover dark:brightness-[0.2] dark:grayscale"
+                      className="h-full w-full rounded-sm object-cover"
                     />
                   </AspectRatio>
                 </CardHeader>

@@ -173,7 +173,7 @@ export const IntegrationCard = ({
               width={160}
               height={160}
               sizes="(min-width: 640px) 10rem, 8rem"
-              className="h-full w-full rounded-lg object-cover dark:brightness-[0.2] dark:grayscale"
+              className="h-full w-full rounded-lg object-cover"
             />
           </div>
         )}

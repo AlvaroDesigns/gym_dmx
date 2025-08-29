@@ -207,7 +207,7 @@ function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
               src="https://dmxgym.com/wp-content/uploads/2024/07/nutricion_deportiva.jpg"
               alt="Image"
               fill
-              className="absolute inset-0 object-cover dark:brightness-[0.2] dark:grayscale"
+              className="absolute inset-0 object-cover"
             />
           </div>
         </CardContent>

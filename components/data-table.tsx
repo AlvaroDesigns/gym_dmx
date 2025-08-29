@@ -85,15 +85,13 @@ function DragHandle({ id }: { id: string | number }) {
 
 function DraggableRow<TData>({
   row,
-  columns,
   enableDrag = true,
 }: {
   row: Row<TData>;
-  columns: ColumnDef<TData>[];
   enableDrag?: boolean;
 }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: (row.original as any).id?.toString() || row.id,
+    id: (row.original as unknown as { id?: string | number }).id?.toString() || row.id,
   });
 
   return (
@@ -137,6 +135,7 @@ interface DataTableProps<TData> {
   manualPagination?: boolean;
   pageCount?: number;
   onPageChange?: (pageIndex: number, pageSize: number) => void;
+  customActions?: React.ReactNode;
 }
 
 export function DataTable<TData>({
@@ -155,6 +154,7 @@ export function DataTable<TData>({
   manualPagination = false,
   pageCount,
   onPageChange,
+  customActions,
 }: DataTableProps<TData>) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -179,7 +179,11 @@ export function DataTable<TData>({
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(
     () =>
-      data?.map((item) => getRowId?.(item) || (item as any).id?.toString() || '') || [],
+      data?.map(
+        (item) =>
+          getRowId?.(item) ||
+          ((item as unknown as { id?: string | number }).id?.toString() ?? ''),
+      ) || [],
     [data, getRowId],
   );
 
@@ -193,7 +197,10 @@ export function DataTable<TData>({
         header: () => null,
         cell: ({ row }) => (
           <DragHandle
-            id={getRowId?.(row.original) || (row.original as any).id || row.id}
+            id={
+              getRowId?.(row.original) ||
+              ((row.original as unknown as { id?: string | number }).id ?? row.id)
+            }
           />
         ),
       });
@@ -242,7 +249,9 @@ export function DataTable<TData>({
       pagination: enablePagination ? pagination : { pageIndex: 0, pageSize: data.length },
     },
     getRowId: (row) =>
-      getRowId?.(row) || (row as any).id?.toString() || Math.random().toString(),
+      getRowId?.(row) ||
+      ((row as unknown as { id?: string | number }).id?.toString() ??
+        Math.random().toString()),
     enableRowSelection: enableSelection,
     enableSorting,
     enableColumnFilters: enableFiltering,
@@ -253,7 +262,10 @@ export function DataTable<TData>({
     onPaginationChange: enablePagination
       ? (updater) => {
           setPagination((prev) => {
-            const next = typeof updater === 'function' ? (updater as any)(prev) : updater;
+            const next =
+              typeof updater === 'function'
+                ? (updater as (p: typeof prev) => typeof prev)(prev)
+                : updater;
             if (manualPagination) {
               onPageChange?.(next.pageIndex, next.pageSize);
             }
@@ -316,24 +328,14 @@ export function DataTable<TData>({
               enableDrag ? (
                 <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
                   {table.getRowModel().rows.map((row) => (
-                    <DraggableRow
-                      key={row.id}
-                      row={row}
-                      columns={finalColumns}
-                      enableDrag={enableDrag}
-                    />
+                    <DraggableRow key={row.id} row={row} enableDrag={enableDrag} />
                   ))}
                 </SortableContext>
               ) : (
                 table
                   .getRowModel()
                   .rows.map((row) => (
-                    <DraggableRow
-                      key={row.id}
-                      row={row}
-                      columns={finalColumns}
-                      enableDrag={false}
-                    />
+                    <DraggableRow key={row.id} row={row} enableDrag={false} />
                   ))
               )
             ) : (
@@ -437,6 +439,9 @@ export function DataTable<TData>({
           value="outline"
           className="relative flex flex-col gap-4 overflow-auto"
         >
+          {customActions ? (
+            <div className="flex justify-end px-4">{customActions}</div>
+          ) : null}
           {tableContent}
           {paginationContent}
         </TabsContent>
@@ -455,6 +460,7 @@ export function DataTable<TData>({
 
   return (
     <div className="w-full flex flex-col gap-4">
+      {customActions ? <div className="flex justify-end">{customActions}</div> : null}
       {tableContent}
       {paginationContent}
     </div>

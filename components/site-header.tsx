@@ -6,6 +6,7 @@ import { IconLogout } from '@tabler/icons-react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { DynamicBreadcrumb } from './dynamic-breadcrumb';
+import { ThemeToggle } from './theme-toggle';
 
 export function SiteHeader() {
   return (
@@ -20,6 +21,7 @@ export function SiteHeader() {
           <DynamicBreadcrumb />
         </div>
         <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
           <Link
             className="hidden sm:flex items-center gap-2"
             href="/"
