@@ -93,7 +93,7 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
   }
 
   return (
-    <div className="overflow-y-scroll">
+    <div className="overflow-y-scroll mb-24">
       {/* Reservas del usuario */}
       <BookingList events={userEvents} />
 
@@ -124,7 +124,11 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
       <div className="flex flex-col">
         <div className="flex flex-row gap-4 p-6 pt-1">
           {PRODUCTS.map((item: { id: string; name: string; image: string }) => (
-            <div key={item.id} className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
+            <div
+              key={item.id}
+              className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative cursor-pointer"
+              onClick={() => (window.location.href = 'mailto:info@dmxgym.com')}
+            >
               <div className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
                 <AspectRatio ratio={16 / 14} className="bg-muted rounded-lg">
                   <Image
