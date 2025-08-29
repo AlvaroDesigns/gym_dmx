@@ -26,7 +26,7 @@ export default function Page() {
     dni: params.$dni as string,
   });
 
-  const data = users?.at(0);
+  const data = Array.isArray(users) ? users[0] : users?.data?.[0];
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'all',
