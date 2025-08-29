@@ -97,7 +97,13 @@ export const IntegrationCard = ({
         }) as any,
   });
 
-  const fieldsData = getEditFieldsModalZones(type, name, description, room, maxCapacity);
+  const fieldsData = getEditFieldsModalZones(
+    isZone ? 'zones' : 'classes',
+    name ?? '',
+    description ?? '',
+    room ?? '',
+    maxCapacity ?? 0,
+  );
 
   const onSubmit = async (data: FormValues) => {
     try {
