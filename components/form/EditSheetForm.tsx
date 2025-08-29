@@ -37,7 +37,6 @@ type FieldOption = {
   label: string;
 };
 
-// Ahora FieldConfig recibe T
 export type FieldConfig<T extends FieldValues> =
   | {
       type: 'text' | 'textarea' | 'number' | 'time';
