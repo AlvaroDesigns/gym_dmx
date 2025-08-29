@@ -1,3 +1,4 @@
+import type { FieldConfig } from '@/components/form/EditSheetForm';
 import EditSheetForm from '@/components/form/EditSheetForm';
 import {
   AlertDialog,
@@ -24,7 +25,7 @@ import { ClassTypes, ZONE_TYPE } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import * as React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type DefaultValues } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
 
@@ -57,13 +58,11 @@ const FormZonesSchema = z.object({
 export const IntegrationCard = ({
   id,
   color,
-  classId,
   name,
   description,
   maxCapacity,
   room,
   type,
-  index,
   onClick,
 }: ClassSectionProps) => {
   const [open, setOpen] = React.useState(false);
@@ -94,7 +93,7 @@ export const IntegrationCard = ({
           description,
           room,
           maxCapacity,
-        }) as any,
+        }) as DefaultValues<FormValues>,
   });
 
   const fieldsData = getEditFieldsModalZones(
@@ -103,7 +102,7 @@ export const IntegrationCard = ({
     description ?? '',
     room ?? '',
     maxCapacity ?? 0,
-  );
+  ) as unknown as FieldConfig<FormValues>[];
 
   const onSubmit = async (data: FormValues) => {
     try {
