@@ -131,7 +131,7 @@ interface DataTableProps<TData> {
   enableFiltering?: boolean;
   pageSize?: number;
   showTabs?: boolean;
-  customActions?: React.ReactNode;
+
   onDataChange?: (data: TData[]) => void;
   getRowId?: (row: TData) => string;
   manualPagination?: boolean;
@@ -150,7 +150,6 @@ export function DataTable<TData>({
   enableFiltering = true,
   pageSize = 10,
   showTabs = true,
-  customActions,
   onDataChange,
   getRowId,
   manualPagination = false,
@@ -269,7 +268,7 @@ export function DataTable<TData>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     manualPagination,
-    pageCount: manualPagination ? pageCount ?? -1 : undefined,
+    pageCount: manualPagination ? (pageCount ?? -1) : undefined,
   });
 
   function handleDragEnd(event: DragEndEvent) {
