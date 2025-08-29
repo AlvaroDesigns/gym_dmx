@@ -11,6 +11,7 @@ import { ROUTES_URL } from '@/config/url';
 import { useViewToggle } from '@/hooks/use-view-toggle';
 import { useGetUsers } from '@/hooks/users/use-get-users';
 import { ROLES_EMPLOYEE } from '@/types';
+import { UserData } from '@/types/user';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -33,8 +34,8 @@ export default function Page() {
     pageSize,
   });
 
-  const rawUsers = Array.isArray(data) ? data : data?.data;
-  const filteredStaff = rawUsers?.filter((staff) => {
+  const rawUsers: UserData[] | undefined = Array.isArray(data) ? data : data?.data;
+  const filteredStaff: UserData[] | undefined = rawUsers?.filter((staff) => {
     const fullName = `${staff.name} ${staff.surname}`.toLowerCase();
     return fullName.includes(filter.toLowerCase());
   });
@@ -42,7 +43,7 @@ export default function Page() {
 
   // Transform data to match Customer interface
   const transformedData: any[] =
-    filteredStaff?.map((customer) => ({
+    filteredStaff?.map((customer: UserData) => ({
       id: customer.dni,
       name: customer.name,
       surname: customer.surname,
@@ -50,7 +51,7 @@ export default function Page() {
       email: customer.email,
       dni: customer.dni,
       phone: customer.phone,
-      roles: customer.roles?.map((role) => role.toString()) || [],
+      roles: customer.roles?.map((role: any) => role?.toString?.()) || [],
       createdAt: new Date().toISOString(),
     })) || [];
 

@@ -38,7 +38,7 @@ export default function RootLayout({
     process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY ?? process.env.IMAGEKIT_PUBLIC_KEY ?? '';
   const authenticationEndpoint = '/api/imagekit/auth';
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProvider>
           <IKContext
