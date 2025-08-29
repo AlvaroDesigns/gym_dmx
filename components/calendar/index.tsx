@@ -34,7 +34,8 @@ export default function DateStripTabs({
   const { data: session } = useSession();
   const sessionEmail = (session?.user as { email?: string } | undefined)?.email;
   const { data: users } = useGetUsers({ roles: [], email: sessionEmail });
-  const currentUser = users?.[0];
+  const usersArray = Array.isArray(users) ? users : (users?.data ?? []);
+  const currentUser = usersArray[0];
 
   const today = dayjs();
   const [currentWeekStart, setCurrentWeekStart] = useState(today.startOf('week'));

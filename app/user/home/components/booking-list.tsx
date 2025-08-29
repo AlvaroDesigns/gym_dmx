@@ -52,8 +52,11 @@ export function BookingList({ events }: { events: ClassEvent[] }) {
               }}
             >
               <Card className="w-full flex flex-row p-0 gap-4 pt-0 items-stretch">
-                <CardHeader className="!p-0 w-28 md:w-40 shrink-0 gap-0">
-                  <AspectRatio ratio={1} className="bg-muted rounded-sm overflow-hidden">
+                <CardHeader className="!p-0 w-40 md:w-45 shrink-0 gap-0">
+                  <AspectRatio
+                    ratio={16 / 12}
+                    className="bg-muted rounded-sm overflow-hidden"
+                  >
                     <Image
                       fill
                       alt="Photo by Drew Beamer"

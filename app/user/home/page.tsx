@@ -7,6 +7,7 @@ import { BottomTabs } from '@/components/bottom-tabs';
 import SkeletonHome from '@/components/skeletons';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Card } from '@/components/ui/card';
+import { PRODUCTS } from '@/data/model';
 import { useGetEvents } from '@/hooks/events/use-get-events';
 import type { ClassEvent as RBCEvent } from '@/hooks/useClasses';
 import { dayjs } from '@/lib/dayjs';
@@ -94,14 +95,14 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
   }
 
   return (
-    <>
+    <div className="overflow-auto">
       {/* Reservas del usuario */}
       <BookingList events={userEvents} />
 
       {/* Workout */}
       <div className="flex flex-col">
-        <h2 className="text-xl font-bold px-6">Entrenamiento</h2>
-        <div className="flex flex-row gap-4 p-6 pt-3 overflow-auto">
+        <h2 className="text-xl font-bold px-6 ">Entrenamiento</h2>
+        <div className="flex flex-row gap-4 p-6 py-3 overflow-auto">
           <Card className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
             <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg">
               <Image
@@ -111,7 +112,7 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
                 className="h-full w-full rounded-lg object-cover"
               />
             </AspectRatio>
-            <div className="absolute z-10 top-8 flex mx-3 px-4 flex-col justify-start w-1/2">
+            <div className="absolute z-10 top-8 flex px-4 flex-col justify-start w-1/2">
               <h3 className="text-xl font-bold text-black">Pulsa para entrenar</h3>
               <p className="text-gray-900 text-sm">
                 Elige una rutina o crea tu propio entrenamiento
@@ -120,8 +121,34 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
           </Card>
         </div>
       </div>
+
+      {/* More Options */}
+      <div className="flex flex-col">
+        <div className="flex flex-row gap-4 p-6 pt-1">
+          {PRODUCTS.map((item: { id: string; name: string; image: string }) => (
+            <div key={item.id} className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
+              <div className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
+                <AspectRatio ratio={16 / 14} className="bg-muted rounded-lg">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="h-full w-full rounded-lg object-cover"
+                  />
+                </AspectRatio>
+                <div className="absolute z-10 top-12 flex px-2 flex-col w-full">
+                  <h3 className="text-xl font-bold text-white w-full flex justify-center">
+                    {item.name}
+                  </h3>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Botón fijo sobre BottomTabs con hueco inferior para el botón circular */}
       <BookingUser />
-    </>
+    </div>
   );
 };

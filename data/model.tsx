@@ -75,3 +75,16 @@ export const ES_PROVINCE_BY_PREFIX: Record<string, string> = {
   '51': 'Ceuta',
   '52': 'Melilla',
 };
+
+export const PRODUCTS = [
+  {
+    id: 'nutricion',
+    name: 'Nutrición',
+    image: '/img/nutricion.png',
+  },
+  {
+    id: 'gym-for-day',
+    name: '  Prueba un día',
+    image: '/img/gym-for-day.png',
+  },
+];
