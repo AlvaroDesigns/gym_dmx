@@ -13,14 +13,16 @@ import { AlertCircleIcon, Eye, EyeOff } from 'lucide-react';
 import { ROUTES_URL } from '@/config/url';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function Home() {
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-3xl">
-        <LoginForm />
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );
