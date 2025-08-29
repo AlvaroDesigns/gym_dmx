@@ -18,6 +18,7 @@ export type ClassEvent = RBCEvent & {
     id: string;
     name: string | null;
     surname: string | null;
+    email?: string | null;
     instagram?: string | null;
     tiktok?: string | null;
   }>;

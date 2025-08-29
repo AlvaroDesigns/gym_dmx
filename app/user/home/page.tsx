@@ -6,7 +6,6 @@ import { BookingUser } from '@/app/user/home/components/booking-user';
 import { BottomTabs } from '@/components/bottom-tabs';
 import SkeletonHome from '@/components/skeletons';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Card } from '@/components/ui/card';
 import { PRODUCTS } from '@/data/model';
 import { useGetEvents } from '@/hooks/events/use-get-events';
 import type { ClassEvent as RBCEvent } from '@/hooks/useClasses';
@@ -50,13 +49,12 @@ export default function Page() {
       .sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0));
   }, [calendarData]);
 
-  // Filtra eventos donde el usuario actual está en la lista de participantes
   const userEvents = useMemo(() => {
     if (!user) return [] as typeof events;
     return events
       .filter((evt) =>
         (evt.participantsList || []).some(
-          (p) => p.name === user?.name && p.surname === user?.surname,
+          (p) => p.name === user?.name && p.email === user?.email,
         ),
       )
       .filter((evt) => dayjs().isBefore(dayjs(evt.end)))
@@ -95,7 +93,7 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
   }
 
   return (
-    <div className="overflow-auto">
+    <div className="overflow-y-scroll">
       {/* Reservas del usuario */}
       <BookingList events={userEvents} />
 
@@ -103,7 +101,7 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
       <div className="flex flex-col">
         <h2 className="text-xl font-bold px-6 ">Entrenamiento</h2>
         <div className="flex flex-row gap-4 p-6 py-3 overflow-auto">
-          <Card className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
+          <div className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
             <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg">
               <Image
                 src="/img/workout.png"
@@ -118,7 +116,7 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
                 Elige una rutina o crea tu propio entrenamiento
               </p>
             </div>
-          </Card>
+          </div>
         </div>
       </div>
 

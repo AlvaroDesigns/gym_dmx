@@ -26,6 +26,7 @@ export interface CalendarEventDto {
     id: string;
     name: string | null;
     surname: string | null;
+    email?: string | null;
     instagram?: string | null;
     tiktok?: string | null;
   }>;

@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { AlertCircleIcon, Eye, EyeOff } from 'lucide-react';
+import { AlertCircleIcon, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 import { ROUTES_URL } from '@/config/url';
 import Image from 'next/image';
@@ -32,6 +32,7 @@ function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [messageError, setMessageError] = useState<boolean>(false);
   const [inactiveError, setInactiveError] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -45,38 +46,44 @@ function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const email = String(formData.get('email') ?? '');
+      const password = String(formData.get('password') ?? '');
 
-    const formData = new FormData(e.currentTarget);
-    const email = String(formData.get('email') ?? '');
-    const password = String(formData.get('password') ?? '');
+      // Evitar sesiones previas
+      await signOut({ redirect: false });
 
-    // Evitar sesiones previas
-    await signOut({ redirect: false });
+      const res = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
 
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
+      if (res?.ok) {
+        setMessageError(false);
+        setInactiveError(false);
 
-    if (res?.ok) {
-      setMessageError(false);
-      setInactiveError(false);
+        const session = await getSession();
 
-      const session = await getSession();
+        const roles = (session?.user as { roles?: string[] } | undefined)?.roles ?? [];
+        const isAdminOrEmployee = roles.includes('ADMIN') || roles.includes('EMPLOYEE');
 
-      const roles = (session?.user as { roles?: string[] } | undefined)?.roles ?? [];
-      const isAdminOrEmployee = roles.includes('ADMIN') || roles.includes('EMPLOYEE');
-
-      if (isAdminOrEmployee) {
-        router.push(ROUTES_URL.DASHBOARD);
+        if (isAdminOrEmployee) {
+          router.push(ROUTES_URL.DASHBOARD);
+        } else {
+          router.push(ROUTES_URL.USER);
+        }
       } else {
-        router.push(ROUTES_URL.USER);
+        setMessageError(true);
+        setInactiveError(false);
+        toast.error('Usuario o contraseña incorrectos');
       }
-    } else {
-      setMessageError(true);
-      setInactiveError(false);
-      toast.error('Usuario o contraseña incorrectos');
+    } catch {
+      toast.error('Error al iniciar sesión');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -145,8 +152,15 @@ function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
                 </div>
               </div>
 
-              <Button type="submit" className="h-12 w-full">
-                Login
+              <Button type="submit" className="h-12 w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Iniciando...
+                  </span>
+                ) : (
+                  'Login'
+                )}
               </Button>
               {messageError && (
                 <Alert variant="destructive">
