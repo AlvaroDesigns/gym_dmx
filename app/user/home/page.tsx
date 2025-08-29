@@ -104,7 +104,7 @@ const RenderHome = (userEvents: RBCEvent[], isLoading: boolean) => {
       {/* Workout */}
       <div className="flex flex-col">
         <h2 className="text-xl font-bold px-6">Entrenamiento</h2>
-        <div className="flex flex-row gap-4 p-6 pt-3 md:gap-6 md:py-6 overflow-auto">
+        <div className="flex flex-row gap-4 p-6 pt-3 overflow-auto">
           <Card className="w-full max-w-sm p-0 gap-4 min-w-[45%] relative">
             <CardContent className="p-0">
               <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg">

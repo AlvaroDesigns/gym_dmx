@@ -134,6 +134,9 @@ interface DataTableProps<TData> {
   customActions?: React.ReactNode;
   onDataChange?: (data: TData[]) => void;
   getRowId?: (row: TData) => string;
+  manualPagination?: boolean;
+  pageCount?: number;
+  onPageChange?: (pageIndex: number, pageSize: number) => void;
 }
 
 export function DataTable<TData>({
@@ -150,6 +153,9 @@ export function DataTable<TData>({
   customActions,
   onDataChange,
   getRowId,
+  manualPagination = false,
+  pageCount,
+  onPageChange,
 }: DataTableProps<TData>) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -245,13 +251,25 @@ export function DataTable<TData>({
     onSortingChange: enableSorting ? setSorting : undefined,
     onColumnFiltersChange: enableFiltering ? setColumnFilters : undefined,
     onColumnVisibilityChange: enableColumnVisibility ? setColumnVisibility : undefined,
-    onPaginationChange: enablePagination ? setPagination : undefined,
+    onPaginationChange: enablePagination
+      ? (updater) => {
+          setPagination((prev) => {
+            const next = typeof updater === 'function' ? (updater as any)(prev) : updater;
+            if (manualPagination) {
+              onPageChange?.(next.pageIndex, next.pageSize);
+            }
+            return next;
+          });
+        }
+      : undefined,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    manualPagination,
+    pageCount: manualPagination ? pageCount ?? -1 : undefined,
   });
 
   function handleDragEnd(event: DragEndEvent) {
@@ -346,7 +364,11 @@ export function DataTable<TData>({
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
-              table.setPageSize(Number(value));
+              const newSize = Number(value);
+              if (manualPagination) {
+                onPageChange?.(table.getState().pagination.pageIndex, newSize);
+              }
+              table.setPageSize(newSize);
             }}
           >
             <SelectTrigger size="sm" className="w-20" id="rows-per-page">

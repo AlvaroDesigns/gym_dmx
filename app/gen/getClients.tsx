@@ -1,12 +1,13 @@
 import { axiosInstance } from '@/lib/client';
-import { RolesType } from '@/types';
 import { UserData } from '@/types/user';
 import type { AxiosRequestConfig } from 'axios';
 
 interface GetUsersParams {
-  roles?: RolesType;
+  roles?: string; // admite lista separada por comas
   dni?: UserData['dni'];
   email?: UserData['email'];
+  page?: number;
+  pageSize?: number;
 }
 
 function getUsersUrl(params: GetUsersParams = {}): string {
@@ -25,6 +26,14 @@ function getUsersUrl(params: GetUsersParams = {}): string {
     url.searchParams.set('email', params?.email);
   }
 
+  if (params?.page) {
+    url.searchParams.set('page', String(params.page));
+  }
+
+  if (params?.pageSize) {
+    url.searchParams.set('pageSize', String(params.pageSize));
+  }
+
   return url.pathname + url.search;
 }
 
@@ -36,5 +45,23 @@ export async function getUsers(
 
   const response = await axiosInstance.get<UserData[]>(url, config);
 
+  return response.data;
+}
+
+export interface PaginatedUsersResponse {
+  data: UserData[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export async function getUsersPaginated(
+  params: Required<Pick<GetUsersParams, 'page' | 'pageSize'>> &
+    Omit<GetUsersParams, 'page' | 'pageSize'>,
+  config: AxiosRequestConfig = {},
+): Promise<PaginatedUsersResponse> {
+  const url = getUsersUrl(params);
+  const response = await axiosInstance.get<PaginatedUsersResponse>(url, config);
   return response.data;
 }

@@ -3,9 +3,11 @@
 import TestimonialCard from '@/components/card-staff';
 import { DataTable } from '@/components/data-table';
 import { ProductLayout } from '@/components/layout/product';
+import { ListHorizontal } from '@/components/sections/list-horizontal';
 import SkeletonHome from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+// Pagination controls are handled inside ListHorizontal for card view
 import { ROUTES_URL } from '@/config/url';
 import { useViewToggle } from '@/hooks/use-view-toggle';
 import { useGetUsers } from '@/hooks/users/use-get-users';
@@ -22,25 +24,34 @@ export default function Page() {
     ['default', 'compiled'],
   );
 
-  const { data, isLoading } = useGetUsers({ roles: ['USER'] });
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
-  const filteredStaff = data?.filter((customer) => {
+  const { data, isLoading } = useGetUsers({
+    roles: ['USER'],
+    page: pageIndex + 1,
+    pageSize,
+  });
+
+  const rawUsers = Array.isArray(data) ? data : data?.data;
+  const filteredStaff = rawUsers?.filter((customer) => {
     const fullName = `${customer.name} ${customer.surname}`.toLowerCase();
     return fullName.includes(filter.toLowerCase());
   });
+  const pageCount = (Array.isArray(data) ? 1 : data?.totalPages) || 1;
 
   // Transform data to match Customer interface
   const transformedData: Customer[] =
     filteredStaff?.map((customer) => ({
-      id: customer.dni, // Use DNI as ID since UserData doesn't have id
+      id: customer.dni,
       name: customer.name,
       surname: customer.surname,
       lastName: customer.lastName,
       email: customer.email,
       dni: customer.dni,
       phone: customer.phone,
-      roles: customer.roles?.map((role) => role.toString()) || [], // Convert Role enum to string array
-      createdAt: new Date().toISOString(), // Use current date since UserData doesn't have createdAt
+      active: customer.active ?? true,
+      createdAt: customer.createdAt || new Date().toISOString(),
     })) || [];
 
   const handleProductLayoutViewChange = (value: 'default' | 'compiled') => {
@@ -87,6 +98,13 @@ export default function Page() {
                 enablePagination={true}
                 enableColumnVisibility={true}
                 showTabs={true}
+                pageSize={pageSize}
+                manualPagination={true}
+                pageCount={(Array.isArray(data) ? 1 : data?.totalPages) || 1}
+                onPageChange={(nextPageIndex, nextPageSize) => {
+                  if (nextPageSize !== pageSize) setPageSize(nextPageSize);
+                  if (nextPageIndex !== pageIndex) setPageIndex(nextPageIndex);
+                }}
                 customActions={
                   <Button variant="outline" size="sm">
                     <span className="hidden lg:inline">Añadir Cliente</span>
@@ -94,19 +112,30 @@ export default function Page() {
                 }
               />
             ) : (
-              filteredStaff?.map((customer, index) => (
-                <TestimonialCard
-                  key={index}
-                  {...customer}
-                  name={`${customer.name} ${customer?.surname} ${customer.lastName || ''}`}
-                  staff={customer.dni}
-                  email={customer.email}
-                  onClick={() =>
-                    router.push(`${ROUTES_URL.CUSTOMERS}/${customer?.dni}/edit`)
-                  }
-                  editable
-                />
-              ))
+              <ListHorizontal
+                items={filteredStaff}
+                renderItem={(customer, index) => (
+                  <TestimonialCard
+                    key={index}
+                    {...customer}
+                    name={`${customer.name} ${customer?.surname} ${customer.lastName || ''}`}
+                    staff={customer.dni}
+                    email={customer.email}
+                    onClick={() =>
+                      router.push(`${ROUTES_URL.CUSTOMERS}/${customer?.dni}/edit`)
+                    }
+                    editable
+                  />
+                )}
+                pageIndex={pageIndex}
+                pageSize={pageSize}
+                setPageIndex={setPageIndex}
+                setPageSize={setPageSize}
+                pageCount={pageCount}
+                totalCount={
+                  Array.isArray(data) ? filteredStaff?.length || 0 : data?.total || 0
+                }
+              />
             )}
           </div>
         </div>

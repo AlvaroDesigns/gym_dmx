@@ -3,6 +3,7 @@
 import TestimonialCard from '@/components/card-staff';
 import { DataTable } from '@/components/data-table';
 import { ProductLayout } from '@/components/layout/product';
+import { ListHorizontal } from '@/components/sections/list-horizontal';
 import SkeletonHome from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,12 +24,21 @@ export default function Page() {
     ['default', 'compiled'],
   );
 
-  const { data, isLoading } = useGetUsers({ roles: ROLES_EMPLOYEE });
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
-  const filteredStaff = data?.filter((staff) => {
+  const { data, isLoading } = useGetUsers({
+    roles: ROLES_EMPLOYEE,
+    page: pageIndex + 1,
+    pageSize,
+  });
+
+  const rawUsers = Array.isArray(data) ? data : data?.data;
+  const filteredStaff = rawUsers?.filter((staff) => {
     const fullName = `${staff.name} ${staff.surname}`.toLowerCase();
     return fullName.includes(filter.toLowerCase());
   });
+  const pageCount = (Array.isArray(data) ? 1 : data?.totalPages) || 1;
 
   // Transform data to match Customer interface
   const transformedData: any[] =
@@ -95,14 +105,25 @@ export default function Page() {
                 }
               />
             ) : (
-              filteredStaff?.map((staff, index) => (
-                <TestimonialCard
-                  editable
-                  key={index}
-                  {...staff}
-                  onClick={() => router.push(`${ROUTES_URL.STAFF}/${staff.dni}/edit`)}
-                />
-              ))
+              <ListHorizontal
+                items={filteredStaff}
+                renderItem={(staff, index) => (
+                  <TestimonialCard
+                    editable
+                    key={index}
+                    {...staff}
+                    onClick={() => router.push(`${ROUTES_URL.STAFF}/${staff.dni}/edit`)}
+                  />
+                )}
+                pageIndex={pageIndex}
+                pageSize={pageSize}
+                setPageIndex={setPageIndex}
+                setPageSize={setPageSize}
+                pageCount={pageCount}
+                totalCount={
+                  Array.isArray(data) ? filteredStaff?.length || 0 : data?.total || 0
+                }
+              />
             )}
           </div>
         </div>

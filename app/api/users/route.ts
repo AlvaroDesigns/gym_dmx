@@ -195,6 +195,8 @@ export async function GET(request: NextRequest) {
     const roles = searchParams.get('roles');
     const doc = searchParams.get('dni');
     const email = searchParams.get('email');
+    const pageParam = searchParams.get('page');
+    const pageSizeParam = searchParams.get('pageSize');
 
     // Construir filtro dinámico
     const where: Prisma.UserWhereInput = {};
@@ -217,30 +219,59 @@ export async function GET(request: NextRequest) {
       where.email = { contains: email, mode: 'insensitive' };
     }
 
+    const baseSelect = {
+      id: true,
+      birthDate: true,
+      gender: true,
+      dni: true,
+      phone: true,
+      postalCode: true,
+      address: true,
+      city: true,
+      province: true,
+      email: true,
+      createdAt: true,
+      lastOrderDate: true,
+      roles: true,
+      active: true,
+      country: true,
+      lastName: true,
+      name: true,
+      surname: true,
+      instagram: true,
+      tiktok: true,
+      privateProfile: true,
+    } as const;
+
+    const hasPagination = !!(pageParam && pageSizeParam);
+
+    if (hasPagination) {
+      const page = Math.max(parseInt(pageParam || '1', 10) || 1, 1);
+      const pageSize = Math.min(Math.max(parseInt(pageSizeParam || '10', 10) || 10, 1), 100);
+      const skip = (page - 1) * pageSize;
+
+      const [total, users] = await Promise.all([
+        prisma.user.count({ where }),
+        prisma.user.findMany({
+          where,
+          select: baseSelect,
+          skip,
+          take: pageSize,
+          orderBy: { createdAt: 'desc' },
+        }),
+      ]);
+
+      const totalPages = Math.ceil(total / pageSize);
+      return NextResponse.json(
+        { data: users, total, page, pageSize, totalPages },
+        { status: 200 },
+      );
+    }
+
     const users = await prisma.user.findMany({
       where,
-      select: {
-        id: true,
-        birthDate: true,
-        gender: true,
-        dni: true,
-        phone: true,
-        postalCode: true,
-        address: true,
-        city: true,
-        province: true,
-        email: true,
-        createdAt: true,
-        lastOrderDate: true,
-        roles: true,
-        country: true,
-        lastName: true,
-        name: true,
-        surname: true,
-        instagram: true,
-        tiktok: true,
-        privateProfile: true,
-      },
+      select: baseSelect,
+      orderBy: { createdAt: 'desc' },
     });
 
     return NextResponse.json(Array.isArray(users) ? users : [], { status: 200 });

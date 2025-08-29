@@ -20,7 +20,7 @@ export interface Customer {
   email: string;
   dni: string;
   phone: string;
-  roles: string[];
+  active?: boolean;
   createdAt: string;
 }
 
@@ -57,12 +57,15 @@ export const columns: ColumnDef<Customer>[] = [
     },
   },
   {
-    accessorKey: 'roles',
-    header: 'Rol',
+    accessorKey: 'active',
+    header: 'Estado',
     cell: ({ row }) => (
-      <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.roles.join(', ')}
+      <div className="w-28">
+        <Badge
+          variant={row.original.active ? 'default' : 'destructive'}
+          className="px-1.5"
+        >
+          {row.original.active ? 'Activo' : 'Inactivo'}
         </Badge>
       </div>
     ),

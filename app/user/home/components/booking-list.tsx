@@ -24,7 +24,7 @@ export function BookingList({ events }: { events: ClassEvent[] }) {
         <h2 className="text-xl font-bold">Agenda</h2>
       </div>
 
-      <div className="flex flex-col gap-4 p-6 pt-3 md:gap-6 md:py-6">
+      <div className="flex flex-col gap-4 p-6 pt-3">
         {events?.length === 0 && (
           <Alert>
             <>

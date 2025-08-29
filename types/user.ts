@@ -1,6 +1,7 @@
 import { Gender, Role } from '@prisma/client';
 
 export interface UserData {
+  id?: string;
   name: string;
   surname: string;
   lastName?: string;
@@ -17,6 +18,8 @@ export interface UserData {
   instagram?: string | null;
   tiktok?: string | null;
   privateProfile?: boolean;
+  active?: boolean;
+  createdAt?: string;
 }
 
 export interface UserUpdateData {
