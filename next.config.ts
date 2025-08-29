@@ -4,9 +4,6 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['dmxgym.com', 'www.profitness.es'],
   },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   async rewrites() {
     return [
       {
