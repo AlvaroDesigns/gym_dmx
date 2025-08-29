@@ -32,7 +32,7 @@ const FormSchema = z.object({
 export default function EditUserForm({ roles }: { roles: UserData['roles'] }) {
   const params = useParams();
   const { data: users } = useGetUsers({
-    roles: [],
+    roles: ['USER'],
     dni: params.$dni as string,
   });
 
