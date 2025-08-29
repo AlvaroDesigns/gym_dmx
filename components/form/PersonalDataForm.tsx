@@ -5,7 +5,7 @@ import { FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { dayjs } from '@/lib/dayjs';
-import { FieldValues, UseFormReturn } from 'react-hook-form';
+import { FieldValues, Path, UseFormReturn } from 'react-hook-form';
 import { DatePicker } from '../datePicker';
 import {
   Select,
@@ -28,7 +28,7 @@ export function PersonalDataForm<T extends FieldValues>({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
-          name="name"
+          name={'name' as Path<T>}
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="surname">Nombre</Label>
@@ -38,7 +38,7 @@ export function PersonalDataForm<T extends FieldValues>({
         />
         <FormField
           control={form.control}
-          name="surname"
+          name={'surname' as Path<T>}
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="surname">Primer Apellido</Label>
@@ -54,7 +54,7 @@ export function PersonalDataForm<T extends FieldValues>({
         />
         <FormField
           control={form.control}
-          name="lastname"
+          name={'lastname' as Path<T>}
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="lastname">Segundo Apellido</Label>
@@ -70,7 +70,7 @@ export function PersonalDataForm<T extends FieldValues>({
         />
         <FormField
           control={form.control}
-          name="dni"
+          name={'dni' as Path<T>}
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="dni">DNI</Label>
@@ -86,7 +86,7 @@ export function PersonalDataForm<T extends FieldValues>({
         />
         <FormField
           control={form.control}
-          name="email"
+          name={'email' as Path<T>}
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="email">Email</Label>
@@ -102,7 +102,7 @@ export function PersonalDataForm<T extends FieldValues>({
         />
         <FormField
           control={form.control}
-          name="phone"
+          name={'phone' as Path<T>}
           render={({ field }) => (
             <FormItem>
               <Label htmlFor="phone">Teléfono</Label>
@@ -119,7 +119,7 @@ export function PersonalDataForm<T extends FieldValues>({
 
         <FormField
           control={form.control}
-          name="gender"
+          name={'gender' as Path<T>}
           render={({ field }) => (
             <FormItem>
               <Label>Género</Label>
@@ -139,7 +139,7 @@ export function PersonalDataForm<T extends FieldValues>({
         />
         <FormField
           control={form.control}
-          name="birthDate"
+          name={'birthDate' as Path<T>}
           render={({ field }) => (
             <FormItem>
               <Label>Fecha de Nacimiento</Label>
