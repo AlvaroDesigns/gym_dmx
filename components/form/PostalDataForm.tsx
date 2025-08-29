@@ -7,17 +7,19 @@ import { Label } from '@/components/ui/label';
 import { Path, UseFormReturn } from 'react-hook-form';
 
 type PostalFormFields = {
-  address: string;
-  postalCode: string;
-  province: string;
-  country: string;
+  address?: string;
+  postalCode?: string;
+  province?: string;
+  country?: string;
 };
 
-interface PostalDataFormProps<T extends PostalFormFields> {
+type PostalFormValues = PostalFormFields & Record<string, unknown>;
+
+interface PostalDataFormProps<T extends PostalFormValues = PostalFormValues> {
   form: UseFormReturn<T>;
 }
 
-export function PostalDataForm<T extends PostalFormFields>({
+export function PostalDataForm<T extends PostalFormValues = PostalFormValues>({
   form,
 }: PostalDataFormProps<T>) {
   return (
@@ -35,7 +37,11 @@ export function PostalDataForm<T extends PostalFormFields>({
                 type="text"
                 id="address"
                 placeholder="Introduce tu dirección"
-                {...field}
+                name={field.name}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                ref={field.ref}
+                value={typeof field.value === 'string' ? field.value : ''}
               />
             </FormItem>
           )}
@@ -51,7 +57,11 @@ export function PostalDataForm<T extends PostalFormFields>({
                 type="text"
                 id="postalCode"
                 placeholder="Introduce tu codigo postal"
-                {...field}
+                name={field.name}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                ref={field.ref}
+                value={typeof field.value === 'string' ? field.value : ''}
               />
             </FormItem>
           )}
@@ -67,7 +77,11 @@ export function PostalDataForm<T extends PostalFormFields>({
                 type="text"
                 id="province"
                 placeholder="Introduce tu provincia"
-                {...field}
+                name={field.name}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                ref={field.ref}
+                value={typeof field.value === 'string' ? field.value : ''}
               />
             </FormItem>
           )}
@@ -83,7 +97,11 @@ export function PostalDataForm<T extends PostalFormFields>({
                 type="text"
                 id="country"
                 placeholder="Introduce tu país"
-                {...field}
+                name={field.name}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                ref={field.ref}
+                value={typeof field.value === 'string' ? field.value : ''}
               />
             </FormItem>
           )}

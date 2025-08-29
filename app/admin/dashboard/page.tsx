@@ -78,8 +78,6 @@ export default function Page() {
     reviewer: customer.Email,
   }));
 
-  console.log('<DataTable data={transformedData} />', expiredOrders);
-
   return (
     <SidebarProvider
       style={
