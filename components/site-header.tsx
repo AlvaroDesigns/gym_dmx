@@ -21,7 +21,6 @@ export function SiteHeader() {
           <DynamicBreadcrumb />
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
           <Link
             className="hidden sm:flex items-center gap-2"
             href="/"
@@ -35,6 +34,7 @@ export function SiteHeader() {
               <IconLogout className="h-4 text-muted-foreground" />
             </>
           </Link>
+          <ThemeToggle />
         </div>
       </div>
     </header>

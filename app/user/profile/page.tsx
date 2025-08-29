@@ -14,7 +14,7 @@ export default function Page() {
     email: 'hello@alvarodesigns.com',
   });
 
-  const user = data?.[0];
+  const user = Array.isArray(data) ? data[0] : data?.data?.[0];
 
   return (
     <div className="flex flex-1 flex-col">

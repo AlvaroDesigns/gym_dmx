@@ -9,7 +9,6 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Card } from '@/components/ui/card';
 import { useGetEvents } from '@/hooks/events/use-get-events';
 import type { ClassEvent as RBCEvent } from '@/hooks/useClasses';
-import { useGetUsers } from '@/hooks/users/use-get-users';
 import { dayjs } from '@/lib/dayjs';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
@@ -17,10 +16,7 @@ import { useMemo } from 'react';
 
 export default function Page() {
   const { data: session } = useSession();
-  const sessionEmail = session?.user?.email ?? undefined;
-  const { data: users } = useGetUsers({ roles: [], email: sessionEmail });
-  const usersArray = (Array.isArray(users) ? users : users?.data) ?? [];
-  const user = usersArray[0];
+  const user = session?.user;
 
   const startDate = useMemo(() => dayjs().startOf('week').format('YYYY-MM-DD'), []);
   const endDate = useMemo(
@@ -65,12 +61,18 @@ export default function Page() {
       .filter((evt) => dayjs().isBefore(dayjs(evt.end)))
       .sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0));
   }, [events, user]);
-
+  console.log('userEvents', session);
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-4">
         {/* User */}
-        <BookingHeader user={user ?? {}} />
+        <BookingHeader
+          user={{
+            name: user?.name ?? undefined,
+            surname:
+              (user as { surname?: string | null } | undefined)?.surname ?? undefined,
+          }}
+        />
 
         {/* Reservas del usuario */}
         {RenderHome(userEvents, isLoading)}
