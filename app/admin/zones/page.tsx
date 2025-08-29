@@ -64,7 +64,7 @@ export default function Page() {
           triggerText="Añadir zonas"
           title="Crear nueva zonas"
           description="Añade una nueva zona. Completa los campos y guarda los cambios."
-          fields={fields as any}
+          fields={fields}
         />
       }
     >

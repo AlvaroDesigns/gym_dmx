@@ -9,18 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import type { ClassItem } from '@/types';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { ColumnDef } from '@tanstack/react-table';
 
-export interface Class {
-  id: number;
-  name: string;
-  description?: string;
-  maxCapacity: number;
-  room: string;
-}
-
-export const columns: ColumnDef<Class>[] = [
+export const columns: ColumnDef<ClassItem>[] = [
   {
     accessorKey: 'name',
     header: 'Nombre',

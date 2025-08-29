@@ -38,7 +38,7 @@ type FieldOption = {
 };
 
 // Ahora FieldConfig recibe T
-type FieldConfig<T extends FieldValues> =
+export type FieldConfig<T extends FieldValues> =
   | {
       type: 'text' | 'textarea' | 'number' | 'time';
       name: Path<T>;

@@ -1,8 +1,9 @@
 // app/api/tools/import-users/route.ts
 export const runtime = 'nodejs';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import type { Role } from '@prisma/client';
 import { hash } from 'bcryptjs';
 import dayjs from 'dayjs';
 import { promises as fs } from 'fs';
@@ -31,7 +32,12 @@ export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
     let isAuth = Boolean(session?.user);
     if (!isAuth) {
-      const token = await getToken({ req: request as any, secret: process.env.NEXTAUTH_SECRET });
+      const token = await getToken({
+        // NextRequest no es compatible aquí, el tipo nativo Request funciona en runtime nodejs
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: request as any,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
       if (token) isAuth = true;
     }
     if (!isAuth) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
@@ -42,7 +48,7 @@ export async function POST(request: Request) {
     // }
     const file = path.join(process.cwd(), 'data/data.json');
     const raw = await fs.readFile(file, 'utf-8');
-    const users: RawUser[] = JSON.parse(raw).slice(0, 20);
+    const users: RawUser[] = (JSON.parse(raw) as RawUser[]).slice(0, 20);
 
     const hashed = await hash('Test123', 10);
 
@@ -64,7 +70,7 @@ export async function POST(request: Request) {
       province: u.country ?? '', // en tu JSON es provincia
       email: String(u.email),
       password: hashed,
-      roles: ['USER'] as any,
+      roles: ['USER'] as Role[],
     }));
 
     await prisma.user.createMany({
@@ -73,7 +79,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ inserted: data.length }, { status: 201 });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'error' }, { status: 500 });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

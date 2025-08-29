@@ -1,6 +1,7 @@
 import type { PutClassData } from '@/hooks/class/use-put-class';
 import { axiosInstance } from '@/lib/client';
-import { UserData } from '@/types/user';
+
+import type { ClassData, ClassItem } from '@/types';
 import type { AxiosRequestConfig } from 'axios';
 
 function classUrl(): string {
@@ -25,12 +26,12 @@ export async function deleteClass(
 }
 
 export async function postClass(
-  data: any,
+  data: ClassData,
   config: AxiosRequestConfig = {},
-): Promise<UserData[]> {
+): Promise<ClassItem> {
   const url = classUrl();
 
-  const response = await axiosInstance.post<UserData[]>(url, data, config);
+  const response = await axiosInstance.post<ClassItem>(url, data, config);
 
   return response.data;
 }
@@ -46,10 +47,10 @@ export async function putClass(
   return response.data;
 }
 
-export async function getClass(config: AxiosRequestConfig = {}): Promise<UserData[]> {
+export async function getClass(config: AxiosRequestConfig = {}): Promise<ClassItem[]> {
   const url = classUrl();
 
-  const response = await axiosInstance.get<UserData[]>(url, config);
+  const response = await axiosInstance.get<ClassItem[]>(url, config);
 
   return response.data;
 }

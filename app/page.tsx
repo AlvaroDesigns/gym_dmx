@@ -26,7 +26,7 @@ export default function Home() {
   );
 }
 
-export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
+function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [messageError, setMessageError] = useState<boolean>(false);
   const [inactiveError, setInactiveError] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);

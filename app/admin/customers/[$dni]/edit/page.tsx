@@ -18,7 +18,7 @@ export default function Page() {
   const data = users?.at(0);
 
   return (
-    <ProductLayout isButton={false} isLoading={isLoading}>
+    <ProductLayout isLoading={isLoading}>
       <AvatarSections name={data?.name ?? ''} status={false} />
       {/* User */}
       <div className="flex flex-col gap-4  md:gap-6 md:py-2 w-full">

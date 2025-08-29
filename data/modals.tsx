@@ -1,6 +1,9 @@
+import type { FieldConfig } from '@/components/form/EditSheetForm';
 import { MAX_DAY_FOR_CALENDAR } from '@/config/configuration';
-import { ClassTypes } from '@/types';
+import { ClassData, ClassTypes, ZoneData } from '@/types';
 import dayjs from 'dayjs';
+
+type ClassOrZoneForm = ClassData | ZoneData;
 
 export const getEditFieldsModalZones = (
   type: ClassTypes,
@@ -8,7 +11,7 @@ export const getEditFieldsModalZones = (
   description: string,
   room: string,
   maxCapacity: number,
-): any[] => {
+): FieldConfig<ClassOrZoneForm>[] => {
   if (type === 'zones') {
     return [
       {
@@ -68,7 +71,9 @@ export const getEditFieldsModalZones = (
   ];
 };
 
-export const getFieldsModalZones = (type: ClassTypes): any[] => {
+export function getFieldsModalZones(type: 'classes'): FieldConfig<ClassData>[];
+export function getFieldsModalZones(type: 'zones'): FieldConfig<ZoneData>[];
+export function getFieldsModalZones(type: ClassTypes): FieldConfig<ClassOrZoneForm>[] {
   if (type === 'zones') {
     return [
       {
@@ -112,7 +117,7 @@ export const getFieldsModalZones = (type: ClassTypes): any[] => {
       placeholder: 'Selecciona la sala',
       searchable: true,
       options: [
-        { label: `Sala ${1}`, value: 1 },
+        { label: `Sala ${1}`, value: 'sala1' },
         { label: 'Sala 1', value: 'sala1' },
         { label: 'Sala 2', value: 'sala2' },
         { label: 'Sala 3', value: 'sala3' },
@@ -128,9 +133,25 @@ export const getFieldsModalZones = (type: ClassTypes): any[] => {
       suffix: 'personas',
     },
   ];
-};
+}
 
-export const getFieldsModalCalendar = (data?: any): any[] => {
+type SelectOption = { label: string; value: string };
+export interface CalendarFormData {
+  className: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  room: string;
+  maxCapacity: number;
+  monitor: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+}
+
+export const getFieldsModalCalendar = (data?: {
+  employees?: SelectOption[];
+  zones?: SelectOption[];
+  classes?: SelectOption[];
+}): FieldConfig<CalendarFormData>[] => {
   const { employees = [], zones = [], classes = [] } = data ?? {};
 
   return [

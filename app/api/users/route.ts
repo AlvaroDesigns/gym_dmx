@@ -1,8 +1,8 @@
+import { authOptions } from '@/lib/auth';
 import { hash } from 'bcryptjs';
 import { getToken } from 'next-auth/jwt';
 import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
-import { authOptions } from '../auth/[...nextauth]/route';
 
 import { prisma } from '@/lib/prisma';
 import { UserUpdateData } from '@/types/user';

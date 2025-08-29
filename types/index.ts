@@ -18,6 +18,16 @@ export interface ClassData {
   maxCapacity: number;
   room: string;
   zoneId?: string | null;
+  color?: string;
+}
+
+export interface ClassItem {
+  id: string;
+  name: string;
+  description?: string;
+  maxCapacity: number;
+  room: string;
+  color?: string | null;
 }
 
 export interface ZoneData {

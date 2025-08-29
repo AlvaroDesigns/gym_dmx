@@ -24,7 +24,7 @@ export default function Page() {
   const { data: classes, isLoading } = useGetClass();
 
   const createClassMutation = useCreateClass();
-  const fields = getFieldsModalZones(CLASS_TYPE);
+  const fields = getFieldsModalZones('classes');
 
   const { currentView, handleViewChange } = useViewToggle<'default' | 'compiled'>(
     'default',
@@ -48,7 +48,9 @@ export default function Page() {
     createClassMutation.mutate(
       {
         ...data,
-        color: TAILWIND_HEX_COLORS[color as keyof typeof TAILWIND_HEX_COLORS],
+        color: data?.color
+          ? TAILWIND_HEX_COLORS[data?.color as keyof typeof TAILWIND_HEX_COLORS]
+          : undefined,
       },
       {
         onSuccess: () => {
@@ -85,7 +87,7 @@ export default function Page() {
           triggerText="Añadir actividades"
           title="Crear nueva actividad"
           description="Añade una nueva actividad. Completa los campos y guarda los cambios."
-          fields={fields as any}
+          fields={fields}
         />
       }
     >
