@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { IKContext } from 'imagekitio-react';
 import { SessionProvider } from 'next-auth/react';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { useState } from 'react';
@@ -28,11 +29,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const urlEndpoint =
+    process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT ??
+    process.env.IMAGEKIT_URL_ENDPOINT ??
+    '';
+  const publicKey =
+    process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY ?? process.env.IMAGEKIT_PUBLIC_KEY ?? '';
+  const authenticationEndpoint = '/api/imagekit/auth';
   return (
     <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProvider>
-          <Providers>{children}</Providers>
+          <IKContext
+            publicKey={publicKey}
+            urlEndpoint={urlEndpoint}
+            transformationPosition="path"
+            authenticationEndpoint={authenticationEndpoint}
+          >
+            <Providers>{children}</Providers>
+          </IKContext>
         </SessionProvider>
         <Toaster />
       </body>
