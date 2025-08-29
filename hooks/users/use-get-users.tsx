@@ -5,6 +5,7 @@ import {
 } from '@/app/gen/getClients';
 import { queryConstants } from '@/config/query';
 import { RolesType } from '@/types';
+import type { UserData } from '@/types/user';
 import { generateQueryKey } from '@/utils/generateQueryKey';
 import { useQuery } from '@tanstack/react-query';
 
