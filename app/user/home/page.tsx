@@ -61,7 +61,7 @@ export default function Page() {
       .filter((evt) => dayjs().isBefore(dayjs(evt.end)))
       .sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0));
   }, [events, user]);
-  console.log('userEvents', session);
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-4">

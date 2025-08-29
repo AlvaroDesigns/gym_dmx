@@ -31,7 +31,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { ROUTES_URL } from '@/config/url';
-import { useGetUsers } from '@/hooks/users/use-get-users';
 import { useSession } from 'next-auth/react';
 
 const data = {
@@ -154,12 +153,9 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
-  const sessionEmail = session?.user?.email ?? undefined;
-  const { data: users } = useGetUsers({ roles: [], email: sessionEmail });
-  const userFromApi = users?.[0];
   const displayUser = {
-    name: userFromApi?.name ?? data.user.name,
-    email: sessionEmail ?? data.user.email,
+    name: session?.user?.name ?? data.user.name,
+    email: session?.user?.email ?? data.user.email,
     avatar: data.user.avatar,
   };
 
@@ -177,6 +173,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
     return base;
   }, [isAdminOrEmployee]);
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
