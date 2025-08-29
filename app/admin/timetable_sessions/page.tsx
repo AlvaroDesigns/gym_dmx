@@ -31,7 +31,14 @@ export default function Page() {
   const { data } = useGetMaestres();
 
   const createCalendarMutation = usePostEvents();
-  const fields = getFieldsModalCalendar(data);
+  const selectData = data
+    ? {
+        employees: data.employees?.map((i) => ({ label: i.text, value: i.value })),
+        zones: data.zones?.map((i) => ({ label: i.text, value: i.value })),
+        classes: data.classes?.map((i) => ({ label: i.text, value: i.value })),
+      }
+    : undefined;
+  const fields = getFieldsModalCalendar(selectData);
 
   const [dateRange, setDateRange] = useState(() => {
     const start = dayjs().startOf('week');
