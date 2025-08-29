@@ -5,8 +5,8 @@ export type ClassTypes = 'classes' | 'zones' | undefined;
 export type RolesType = 'ADMIN' | 'USER' | 'EMPLOYEE';
 export type DifficultyType = 'EASY' | 'MEDIUM' | 'HARD';
 
-export const ZONE_TYPE: ClassTypes = 'zones';
-export const CLASS_TYPE: ClassTypes = 'classes';
+export const ZONE_TYPE = 'zones' as const;
+export const CLASS_TYPE = 'classes' as const;
 
 export const ROLES_ADMIN: RolesType[] = ['ADMIN'];
 export const ROLES_USER: RolesType[] = ['USER'];
