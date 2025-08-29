@@ -1,12 +1,12 @@
 'use client';
 
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { IconLogout } from '@tabler/icons-react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { DynamicBreadcrumb } from './dynamic-breadcrumb';
-import { ThemeToggle } from './theme-toggle';
 
 export function SiteHeader() {
   return (
