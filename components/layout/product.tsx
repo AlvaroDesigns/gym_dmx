@@ -51,7 +51,12 @@ export const ProductLayout = ({
 
   const normalizedType =
     type === 'class' ? CLASS_TYPE : type === 'zone' ? ZONE_TYPE : undefined;
-  const fields = normalizedType ? getFieldsModalZones(normalizedType) : [];
+  const fields =
+    normalizedType === CLASS_TYPE
+      ? getFieldsModalZones(CLASS_TYPE)
+      : normalizedType === ZONE_TYPE
+        ? getFieldsModalZones(ZONE_TYPE)
+        : [];
 
   return (
     <SidebarProvider
