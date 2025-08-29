@@ -89,7 +89,7 @@ export default function Page() {
   };
 
   return (
-    <ProductLayout isView isButton={false} isLoading={isLoading}>
+    <ProductLayout isView isLoading={isLoading}>
       <AvatarSections name={data?.name ?? ''} status={false} />
       {/* User */}
       <div className="flex flex-col gap-4  md:gap-6 md:py-2 w-full">

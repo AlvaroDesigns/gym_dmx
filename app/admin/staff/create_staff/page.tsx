@@ -58,7 +58,7 @@ export default function Page() {
   };
 
   return (
-    <ProductLayout isButton={false} isLoading={isPending}>
+    <ProductLayout isLoading={isPending}>
       {/* Avatar */}
       <AvatarSections name="Nuevo Empleado" isBanned={false} />
       {/* User */}

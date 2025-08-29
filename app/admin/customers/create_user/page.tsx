@@ -58,7 +58,7 @@ export default function Page() {
   };
 
   return (
-    <ProductLayout isButton={false}>
+    <ProductLayout>
       {/* Avatar */}
       <AvatarSections name="Nuevo Empleado" isBanned={false} />
       {/* User */}
