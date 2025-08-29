@@ -48,7 +48,7 @@ export const ClassSection = ({ data, type }: ClassSectionProps) => {
 
   return (
     <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
-      {data?.map((item, index) => (
+      {data?.map((item: any, index: number) => (
         <IntegrationCard key={item?.id} {...item} type={type} index={index} />
       ))}
     </div>
