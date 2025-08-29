@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import * as XLSX from 'xlsx';
 
 export default function ExcelToJson() {
-  const [jsonData, setJsonData] = useState([]);
+  const [jsonData, setJsonData] = useState<any[]>([]);
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      const result = e.target?.result;
+      if (!result) return;
+      const data = new Uint8Array(result as ArrayBuffer);
       const workbook = XLSX.read(data, { type: 'array' });
 
       // Tomar la primera hoja
