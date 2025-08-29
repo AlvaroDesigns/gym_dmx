@@ -61,10 +61,10 @@ const AvatarComponent = ({ size = 'md', image, name }: AvatarComponentProps) => 
       <AvatarImage src={image} />
       <AvatarFallback
         className={cn(
-          size === 's' && 'text-xs',
-          size === 'sm' && 'text-sm',
-          size === 'md' && 'text-lg',
-          size === 'lg' && 'text-xl',
+          size === 's' && 'text-md',
+          size === 'sm' && 'text-lg',
+          size === 'md' && 'text-xl',
+          size === 'lg' && 'text-2xl',
         )}
       >
         {name?.charAt(0)}

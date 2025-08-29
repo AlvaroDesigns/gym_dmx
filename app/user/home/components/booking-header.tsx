@@ -21,7 +21,10 @@ export function BookingHeader({ user }: { user: User }) {
       </div>
       <div className="flex flex-row gap-3 items-center">
         <ThemeToggle />
-        <IconLogout className="h-8" onClick={() => signOut({ callbackUrl: '/' })} />
+        <IconLogout
+          className="h-8 text-muted-foreground"
+          onClick={() => signOut({ callbackUrl: '/' })}
+        />
       </div>
     </div>
   );

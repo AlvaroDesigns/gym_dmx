@@ -11,7 +11,7 @@ export default function Page() {
   const params = useParams();
 
   const { data: users, isLoading } = useGetUsers({
-    roles: [],
+    roles: ['USER'],
     dni: params.$dni as string,
   });
 

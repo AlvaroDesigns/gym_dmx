@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 export default function Page() {
   const params = useParams();
   const { data: users, isLoading } = useGetUsers({
-    roles: [],
+    roles: ['EMPLOYEE', 'ADMIN'],
     dni: params.$dni as string,
   });
 
